@@ -1,0 +1,107 @@
+/* ============================================================
+   Mathify — shared theme
+   Translated from the Design Composer prototype (Mathify.dc.html)
+   ============================================================ */
+
+body {
+  font-family: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+  color: #1f2733;
+  background: #eef1f6;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, .brandfont {
+  font-family: 'Source Serif 4', Georgia, serif;
+  letter-spacing: -.01em;
+}
+
+:root {
+  --bs-primary: #1d4e89;
+  --bs-primary-rgb: 29, 78, 137;
+  --bs-link-color: #1d4e89;
+  --bs-link-color-rgb: 29, 78, 137;
+  --bs-link-hover-color: #163a66;
+  --bs-border-color: #e2e7ef;
+}
+
+.btn-primary {
+  --bs-btn-bg: #1d4e89;
+  --bs-btn-border-color: #1d4e89;
+  --bs-btn-hover-bg: #163a66;
+  --bs-btn-hover-border-color: #163a66;
+  --bs-btn-active-bg: #13325a;
+  --bs-btn-active-border-color: #13325a;
+  --bs-btn-disabled-bg: #1d4e89;
+  --bs-btn-disabled-border-color: #1d4e89;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: #1d4e89;
+  --bs-btn-border-color: #1d4e89;
+  --bs-btn-hover-bg: #1d4e89;
+  --bs-btn-hover-border-color: #1d4e89;
+  --bs-btn-active-bg: #1d4e89;
+  --bs-btn-active-border-color: #1d4e89;
+}
+
+.progress-bar { background-color: #1d4e89; }
+.nav-pills { --bs-nav-pills-link-active-bg: #1d4e89; }
+.form-check-input:checked { background-color: #1d4e89; border-color: #1d4e89; }
+.page-link { color: #1d4e89; }
+.card { --bs-card-border-color: #e6eaf1; }
+
+.ph-stripe {
+  background-image: repeating-linear-gradient(45deg, #eef2f7, #eef2f7 10px, #e6ebf3 10px, #e6ebf3 20px);
+}
+
+.nav-link { cursor: pointer; }
+a { text-decoration: none; }
+
+/* ---- shared tokens reused across pages ---- */
+.badge-soft   { background: #eef3fa; color: #1d4e89; }
+.badge-success-soft { background: #e7f5ee; color: #1d8a5b; }
+.badge-warn-soft    { background: #fdf3e3; color: #b9761b; }
+
+.brand-mark {
+  display: inline-flex;
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  background: #1d4e89; color: #fff;
+  align-items: center; justify-content: center;
+  font-size: 1.15rem;
+}
+
+.avatar {
+  width: 36px; height: 36px;
+  background: #1d4e89; color: #fff;
+  font-size: .85rem;
+}
+
+.icon-tile {
+  width: 38px; height: 38px;
+  background: #eef3fa; color: #1d4e89;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: .375rem;
+}
+.icon-tile-warn { background: #fdf3e3; color: #b9761b; }
+
+.shell { max-width: 1240px; }
+.thead-soft { background: #f6f8fb; }
+
+/* ---- auth pages ---- */
+.auth-input.form-control { border-color: #dbe1ea; padding: .65rem .9rem; }
+.auth-input.form-control:focus { border-color: #1d4e89; box-shadow: 0 0 0 .2rem rgba(29,78,137,.15); }
+.btn-auth {
+  --bs-btn-bg: #1d4e89; --bs-btn-border-color: #1d4e89;
+  --bs-btn-hover-bg: #163a66; --bs-btn-hover-border-color: #163a66;
+  --bs-btn-active-bg: #13325a;
+  --bs-btn-color: #fff; --bs-btn-hover-color: #fff;
+}
+.glyph-bg {
+  position: absolute; font-family: 'Source Serif 4', serif;
+  color: rgba(255,255,255,.07); user-select: none; line-height: 1;
+}
+.auth-brand-panel {
+  flex: 0 0 44%; background: #1d4e89; color: #fff;
+  padding: 56px; position: relative; overflow: hidden;
+}

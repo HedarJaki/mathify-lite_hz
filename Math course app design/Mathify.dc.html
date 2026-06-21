@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+  body{font-family:'Source Sans 3',system-ui,-apple-system,sans-serif;color:#1f2733;}
+  h1,h2,h3,h4,h5,.brandfont{font-family:'Source Serif 4',Georgia,serif;letter-spacing:-.01em;}
+  :root{--bs-primary:#1d4e89;--bs-primary-rgb:29,78,137;--bs-link-color:#1d4e89;--bs-link-color-rgb:29,78,137;--bs-link-hover-color:#163a66;--bs-border-color:#e2e7ef;}
+  .btn-primary{--bs-btn-bg:#1d4e89;--bs-btn-border-color:#1d4e89;--bs-btn-hover-bg:#163a66;--bs-btn-hover-border-color:#163a66;--bs-btn-active-bg:#13325a;--bs-btn-active-border-color:#13325a;--bs-btn-disabled-bg:#1d4e89;--bs-btn-disabled-border-color:#1d4e89;}
+  .btn-outline-primary{--bs-btn-color:#1d4e89;--bs-btn-border-color:#1d4e89;--bs-btn-hover-bg:#1d4e89;--bs-btn-hover-border-color:#1d4e89;--bs-btn-active-bg:#1d4e89;--bs-btn-active-border-color:#1d4e89;}
+  .progress-bar{background-color:#1d4e89;}
+  .nav-pills{--bs-nav-pills-link-active-bg:#1d4e89;}
+  .form-check-input:checked{background-color:#1d4e89;border-color:#1d4e89;}
+  .page-link{color:#1d4e89;}
+  .card{--bs-card-border-color:#e6eaf1;}
+  .ph-stripe{background-image:repeating-linear-gradient(45deg,#eef2f7,#eef2f7 10px,#e6ebf3 10px,#e6ebf3 20px);}
+  .nav-link{cursor:pointer;}
+  a{text-decoration:none;}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</helmet>
+
+<div style="min-height:100vh;background:#eef1f6;">
+
+  <nav class="navbar navbar-expand-md sticky-top px-3" style="background:#ffffff;border-bottom:1px solid #e2e7ef;z-index:1030;">
+    <div class="container-fluid" style="max-width:1240px;">
+      <span class="navbar-brand brandfont fw-bold d-flex align-items-center gap-2 mb-0" style="color:#1d4e89;font-size:1.4rem;">
+        <span style="display:inline-flex;width:34px;height:34px;border-radius:9px;background:#1d4e89;color:#fff;align-items:center;justify-content:center;font-size:1.15rem;">&Sigma;</span>
+        Mathify
+      </span>
+      <ul class="nav nav-pills gap-1 mx-auto d-none d-md-flex">
+        <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+          <li class="nav-item"><a class="{{ n.cls }}" onClick="{{ n.go }}"><i class="{{ n.icon }} me-2"></i>{{ n.label }}</a></li>
+        </sc-for>
+      </ul>
+      <div class="d-flex align-items-center gap-3">
+        <sc-if value="{{ isStudent }}" hint-placeholder-val="{{ true }}">
+          <div class="d-none d-md-flex align-items-center gap-3">
+            <sc-if value="{{ isPremium }}" hint-placeholder-val="{{ true }}">
+              <span class="badge rounded-pill d-inline-flex align-items-center gap-1" style="background:#1d4e89;color:#fff;font-weight:600;cursor:pointer;padding:.4em .7em;" onClick="{{ goPremiumCta }}" title="Premium member"><i class="bi bi-gem"></i>Premium</span>
+            </sc-if>
+            <sc-if value="{{ notPremium }}" hint-placeholder-val="{{ true }}">
+              <button class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1" onClick="{{ goPremiumCta }}"><i class="bi bi-gem"></i>Upgrade</button>
+            </sc-if>
+            <span class="d-flex align-items-center gap-1 fw-semibold" style="color:#d97706;" title="Day streak"><i class="bi bi-fire"></i>{{ profile.streak }}</span>
+            <span class="d-flex align-items-center gap-1 fw-semibold" style="color:#1d4e89;" title="Energy"><i class="bi bi-lightning-charge-fill"></i>{{ profile.energyLabel }}</span>
+            <span class="badge rounded-pill" style="background:#eef3fa;color:#1d4e89;border:1px solid #d6e2f1;font-weight:600;">Lv {{ profile.level }} &middot; {{ profile.totalXP }} XP</span>
+          </div>
+        </sc-if>
+        <div class="rounded-circle d-flex align-items-center justify-content-center fw-semibold" style="width:36px;height:36px;background:#1d4e89;color:#fff;font-size:.85rem;">{{ avatarInitials }}</div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-4" style="max-width:1240px;">
+
+    <!-- ===================== STUDENT: DASHBOARD ===================== -->
+    <sc-if value="{{ s_dashboard }}" hint-placeholder-val="{{ true }}">
+      <div class="mb-4">
+        <h2 class="mb-1">Welcome back, {{ profile.firstName }}</h2>
+        <p class="text-secondary mb-0">Keep your streak alive — you're {{ profile.xpToNext }} XP from Level {{ profile.nextLevel }}.</p>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+          <div class="card h-100 shadow-sm border-0"><div class="card-body">
+            <div class="d-flex align-items-center gap-2 text-secondary mb-1"><i class="bi bi-fire" style="color:#d97706;"></i><span class="small fw-semibold">Day Streak</span></div>
+            <div class="fs-3 fw-bold">{{ profile.streak }}</div></div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card h-100 shadow-sm border-0"><div class="card-body">
+            <div class="d-flex align-items-center gap-2 text-secondary mb-1"><i class="bi bi-lightning-charge-fill" style="color:#1d4e89;"></i><span class="small fw-semibold">Energy</span></div>
+            <div class="fs-3 fw-bold">{{ profile.energyLabel }}</div></div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card h-100 shadow-sm border-0"><div class="card-body">
+            <div class="d-flex align-items-center gap-2 text-secondary mb-1"><i class="bi bi-stars" style="color:#1d4e89;"></i><span class="small fw-semibold">Total XP</span></div>
+            <div class="fs-3 fw-bold">{{ profile.totalXP }}</div></div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card h-100 shadow-sm border-0"><div class="card-body">
+            <div class="d-flex align-items-center gap-2 text-secondary mb-1"><i class="bi bi-check2-circle" style="color:#1d8a5b;"></i><span class="small fw-semibold">Completed</span></div>
+            <div class="fs-3 fw-bold">{{ profile.completedCount }}</div></div></div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-0 mb-4"><div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-end mb-2">
+          <div><div class="text-secondary small fw-semibold">LEVEL {{ profile.level }}</div><h5 class="mb-0">{{ profile.xpInLevel }} / {{ profile.xpPerLevel }} XP</h5></div>
+          <div class="text-secondary small">Next: Level {{ profile.nextLevel }}</div>
+        </div>
+        <div class="progress" style="height:12px;"><div class="progress-bar" style="width: {{ profile.levelPct }}%;"></div></div>
+      </div></div>
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Continue learning</h4>
+        <a class="btn btn-sm btn-outline-primary" onClick="{{ goCatalog }}">Browse all courses</a>
+      </div>
+      <sc-if value="{{ hasEnrollments }}" hint-placeholder-val="{{ true }}">
+        <div class="row g-3">
+          <sc-for list="{{ enrolledCourses }}" as="c" hint-placeholder-count="2">
+            <div class="col-12 col-lg-6">
+              <div class="card shadow-sm border-0 h-100"><div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div><span class="badge rounded-pill mb-2" style="background:#eef3fa;color:#1d4e89;">{{ c.category }}</span>
+                  <h5 class="mb-0">{{ c.title }}</h5></div>
+                  <span class="text-secondary small">{{ c.progress }}%</span>
+                </div>
+                <div class="progress mb-3" style="height:8px;"><div class="progress-bar" style="width: {{ c.progress }}%;"></div></div>
+                <button class="btn btn-primary btn-sm" onClick="{{ c.onOpen }}"><i class="bi bi-play-fill me-1"></i>Continue</button>
+              </div></div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ noEnrollments }}" hint-placeholder-val="{{ true }}">
+        <div class="card border-0 shadow-sm"><div class="card-body text-center py-5">
+          <i class="bi bi-compass fs-1 text-secondary"></i>
+          <p class="mt-2 mb-3 text-secondary">You're not enrolled in any course yet.</p>
+          <button class="btn btn-primary" onClick="{{ goCatalog }}">Explore courses</button>
+        </div></div>
+      </sc-if>
+    </sc-if>
+
+    <!-- ===================== STUDENT: CATALOG ===================== -->
+    <sc-if value="{{ s_catalog }}" hint-placeholder-val="{{ true }}">
+      <div class="mb-4"><h2 class="mb-1">Course catalog</h2>
+      <p class="text-secondary mb-0">Enroll to unlock chapters, lessons and quizzes.</p></div>
+      <div class="row g-3">
+        <sc-for list="{{ catalog }}" as="c" hint-placeholder-count="3">
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card shadow-sm border-0 h-100"><div class="card-body p-4 d-flex flex-column">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="badge rounded-pill" style="background:#eef3fa;color:#1d4e89;">{{ c.category }}</span>
+                <sc-if value="{{ c.enrolled }}" hint-placeholder-val="{{ true }}"><span class="badge rounded-pill" style="background:#e7f5ee;color:#1d8a5b;"><i class="bi bi-check2 me-1"></i>Enrolled</span></sc-if>
+              </div>
+              <h5 class="mb-2" style="cursor:pointer;" onClick="{{ c.onOpen }}">{{ c.title }}</h5>
+              <p class="text-secondary small flex-grow-1">{{ c.description }}</p>
+              <div class="d-flex align-items-center gap-3 text-secondary small mb-3">
+                <span><i class="bi bi-collection me-1"></i>{{ c.chapterCount }} chapters</span>
+                <span><i class="bi bi-people me-1"></i>{{ c.enrolledCount }}</span>
+              </div>
+              <div class="d-flex gap-2">
+                <sc-if value="{{ c.enrolled }}" hint-placeholder-val="{{ true }}">
+                  <button class="btn btn-primary btn-sm flex-grow-1" onClick="{{ c.onOpen }}">Continue</button>
+                  <button class="btn btn-outline-secondary btn-sm" onClick="{{ c.onUnenroll }}" title="Unenroll"><i class="bi bi-x-lg"></i></button>
+                </sc-if>
+                <sc-if value="{{ c.notEnrolled }}" hint-placeholder-val="{{ true }}">
+                  <button class="btn btn-primary btn-sm flex-grow-1" onClick="{{ c.onEnroll }}"><i class="bi bi-plus-lg me-1"></i>Enroll</button>
+                  <button class="btn btn-outline-primary btn-sm" onClick="{{ c.onOpen }}">Preview</button>
+                </sc-if>
+              </div>
+            </div></div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- ===================== STUDENT: COURSE DETAIL ===================== -->
+    <sc-if value="{{ s_course }}" hint-placeholder-val="{{ true }}">
+      <a class="text-secondary small d-inline-flex align-items-center gap-1 mb-3" onClick="{{ goCatalog }}" style="cursor:pointer;"><i class="bi bi-arrow-left"></i>Back to catalog</a>
+      <div class="card border-0 shadow-sm mb-4"><div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+          <div style="max-width:680px;">
+            <span class="badge rounded-pill mb-2" style="background:#eef3fa;color:#1d4e89;">{{ cur.category }}</span>
+            <h2 class="mb-2">{{ cur.title }}</h2>
+            <p class="text-secondary mb-0">{{ cur.description }}</p>
+          </div>
+          <div class="text-end">
+            <sc-if value="{{ cur.enrolled }}" hint-placeholder-val="{{ true }}">
+              <div class="mb-2"><span class="badge rounded-pill" style="background:#e7f5ee;color:#1d8a5b;"><i class="bi bi-check2 me-1"></i>Enrolled</span></div>
+              <button class="btn btn-outline-secondary btn-sm" onClick="{{ cur.onUnenroll }}">Unenroll</button>
+            </sc-if>
+            <sc-if value="{{ cur.notEnrolled }}" hint-placeholder-val="{{ true }}">
+              <button class="btn btn-primary" onClick="{{ cur.onEnroll }}"><i class="bi bi-plus-lg me-1"></i>Enroll now</button>
+            </sc-if>
+          </div>
+        </div>
+      </div></div>
+
+      <sc-for list="{{ cur.chapters }}" as="ch" hint-placeholder-count="2">
+        <div class="card border-0 shadow-sm mb-3"><div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div><div class="text-secondary small fw-semibold">CHAPTER {{ ch.num }}</div><h5 class="mb-0">{{ ch.title }}</h5></div>
+            <span class="badge rounded-pill" style="background:#fdf3e3;color:#b9761b;"><i class="bi bi-star-fill me-1"></i>{{ ch.xpReward }} XP</span>
+          </div>
+          <div class="list-group list-group-flush">
+            <sc-for list="{{ ch.modules }}" as="m" hint-placeholder-count="2">
+              <a class="list-group-item list-group-item-action d-flex align-items-center gap-3 px-2" style="cursor:pointer;border-color:#eef1f6;" onClick="{{ m.onOpen }}">
+                <span class="d-inline-flex align-items-center justify-content-center rounded" style="width:38px;height:38px;background:#eef3fa;color:#1d4e89;"><i class="{{ m.icon }}"></i></span>
+                <span class="flex-grow-1"><span class="fw-semibold d-block">{{ m.title }}</span><span class="text-secondary small">{{ m.meta }}</span></span>
+                <i class="{{ m.lockIcon }} text-secondary"></i>
+              </a>
+            </sc-for>
+            <sc-for list="{{ ch.quizzes }}" as="q" hint-placeholder-count="1">
+              <a class="list-group-item list-group-item-action d-flex align-items-center gap-3 px-2" style="cursor:pointer;border-color:#eef1f6;" onClick="{{ q.onStart }}">
+                <span class="d-inline-flex align-items-center justify-content-center rounded" style="width:38px;height:38px;background:#fdf3e3;color:#b9761b;"><i class="bi bi-patch-question-fill"></i></span>
+                <span class="flex-grow-1"><span class="fw-semibold d-block">{{ q.title }}</span><span class="text-secondary small">Quiz &middot; pass {{ q.passingScore }}% &middot; {{ q.count }} questions</span></span>
+                <i class="{{ q.lockIcon }} text-secondary"></i>
+              </a>
+            </sc-for>
+          </div>
+        </div></div>
+      </sc-for>
+    </sc-if>
+
+    <!-- ===================== STUDENT: MODULE VIEWER ===================== -->
+    <sc-if value="{{ s_module }}" hint-placeholder-val="{{ true }}">
+      <a class="text-secondary small d-inline-flex align-items-center gap-1 mb-3" onClick="{{ mod.onBack }}" style="cursor:pointer;"><i class="bi bi-arrow-left"></i>Back to {{ mod.courseTitle }}</a>
+      <div class="card border-0 shadow-sm"><div class="card-body p-4">
+        <div class="text-secondary small fw-semibold mb-1">{{ mod.kindLabel }}</div>
+        <h3 class="mb-3">{{ mod.title }}</h3>
+        <sc-if value="{{ mod.isVideo }}" hint-placeholder-val="{{ true }}">
+          <div class="ph-stripe rounded d-flex flex-column align-items-center justify-content-center mb-3" style="aspect-ratio:16/9;">
+            <span class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" style="width:64px;height:64px;background:#1d4e89;color:#fff;"><i class="bi bi-play-fill fs-3"></i></span>
+            <code class="text-secondary">video player &middot; {{ mod.meta }}</code>
+          </div>
+        </sc-if>
+        <sc-if value="{{ mod.isSlide }}" hint-placeholder-val="{{ true }}">
+          <div class="ph-stripe rounded d-flex align-items-center justify-content-center mb-2" style="aspect-ratio:16/9;">
+            <code class="text-secondary">slide {{ mod.slideNum }} of {{ mod.meta }}</code>
+          </div>
+          <div class="d-flex justify-content-between mb-3">
+            <button class="btn btn-outline-secondary btn-sm" onClick="{{ mod.prevSlide }}"><i class="bi bi-chevron-left"></i> Prev</button>
+            <button class="btn btn-outline-secondary btn-sm" onClick="{{ mod.nextSlide }}">Next <i class="bi bi-chevron-right"></i></button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ mod.hasUrl }}" hint-placeholder-val="{{ true }}">
+          <a class="btn btn-outline-primary btn-sm mb-3" href="{{ mod.url }}" target="_blank" rel="noopener"><i class="bi bi-box-arrow-up-right me-1"></i>{{ mod.linkLabel }}</a>
+        </sc-if>
+        <div class="d-flex justify-content-between align-items-center pt-2 border-top" style="border-color:#eef1f6;">
+          <span class="text-secondary small">Earn {{ mod.xp }} XP on completion</span>
+          <button class="btn btn-primary" onClick="{{ mod.onComplete }}"><i class="bi bi-check2 me-1"></i>Mark complete &amp; continue</button>
+        </div>
+      </div></div>
+    </sc-if>
+
+    <!-- ===================== STUDENT: QUIZ PLAYER ===================== -->
+    <sc-if value="{{ s_quiz }}" hint-placeholder-val="{{ true }}">
+      <sc-if value="{{ quiz.active }}" hint-placeholder-val="{{ true }}">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="text-secondary small fw-semibold">{{ quiz.title }}</span>
+          <a class="text-secondary small" style="cursor:pointer;" onClick="{{ quiz.onExit }}">Exit</a>
+        </div>
+        <div class="progress mb-4" style="height:8px;"><div class="progress-bar" style="width: {{ quiz.progressPct }}%;"></div></div>
+        <div class="card border-0 shadow-sm"><div class="card-body p-4">
+          <div class="text-secondary small mb-1">Question {{ quiz.qNum }} of {{ quiz.qTotal }} &middot; {{ quiz.q.typeLabel }} &middot; {{ quiz.q.points }} pts</div>
+          <h4 class="mb-4">{{ quiz.q.prompt }}</h4>
+
+          <sc-if value="{{ quiz.q.isMC }}" hint-placeholder-val="{{ true }}">
+            <div class="d-flex flex-column gap-2">
+              <sc-for list="{{ quiz.q.options }}" as="o" hint-placeholder-count="4">
+                <label class="{{ o.cls }}" onClick="{{ o.onPick }}">
+                  <span class="d-inline-flex align-items-center justify-content-center rounded-circle me-2" style="width:26px;height:26px;border:2px solid {{ o.dot }};color:{{ o.dot }};font-size:.8rem;">{{ o.letter }}</span>{{ o.text }}
+                </label>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ quiz.q.isFill }}" hint-placeholder-val="{{ true }}">
+            <input class="form-control form-control-lg" style="max-width:340px;" placeholder="Type your answer" value="{{ quiz.fillValue }}" onChange="{{ quiz.onFill }}">
+          </sc-if>
+
+          <sc-if value="{{ quiz.q.isDnd }}" hint-placeholder-val="{{ true }}">
+            <p class="text-secondary small">Tap a term, then tap the matching box.</p>
+            <div class="d-flex flex-wrap gap-2 mb-4">
+              <sc-for list="{{ quiz.q.draggables }}" as="d" hint-placeholder-count="3">
+                <button class="{{ d.cls }}" onClick="{{ d.onPick }}">{{ d.text }}</button>
+              </sc-for>
+            </div>
+            <div class="row g-3">
+              <sc-for list="{{ quiz.q.zones }}" as="z" hint-placeholder-count="3">
+                <div class="col-12 col-md-6">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="text-secondary small flex-grow-1">{{ z.label }}</span>
+                    <button class="{{ z.cls }}" onClick="{{ z.onDrop }}" style="min-width:130px;">{{ z.text }}</button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <div class="d-flex justify-content-end mt-4 pt-3 border-top" style="border-color:#eef1f6;">
+            <button class="{{ quiz.nextCls }}" onClick="{{ quiz.onNext }}">{{ quiz.nextLabel }}</button>
+          </div>
+        </div></div>
+      </sc-if>
+
+      <sc-if value="{{ quiz.done }}" hint-placeholder-val="{{ true }}">
+        <div class="card border-0 shadow-sm"><div class="card-body text-center p-5">
+          <span class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width:84px;height:84px;background:{{ quiz.resultBg }};color:{{ quiz.resultColor }};"><i class="{{ quiz.resultIcon }} fs-1"></i></span>
+          <h2 class="mb-1">{{ quiz.resultTitle }}</h2>
+          <p class="text-secondary">You scored <span class="fw-bold" style="color:#1f2733;">{{ quiz.scorePct }}%</span> &middot; passing {{ quiz.passingScore }}%</p>
+          <sc-if value="{{ quiz.passed }}" hint-placeholder-val="{{ true }}"><p class="fw-semibold" style="color:#b9761b;"><i class="bi bi-star-fill me-1"></i>+{{ quiz.xpEarned }} XP earned</p></sc-if>
+          <div class="d-flex gap-2 justify-content-center mt-3">
+            <button class="btn btn-outline-primary" onClick="{{ quiz.onRetry }}">Try again</button>
+            <button class="btn btn-primary" onClick="{{ quiz.onExit }}">Back to course</button>
+          </div>
+        </div></div>
+      </sc-if>
+    </sc-if>
+
+    <!-- ===================== STUDENT: ACHIEVEMENTS ===================== -->
+    <sc-if value="{{ s_achievements }}" hint-placeholder-val="{{ true }}">
+      <div class="mb-4"><h2 class="mb-1">Achievements</h2><p class="text-secondary mb-0">{{ achUnlockedCount }} of {{ achTotal }} unlocked.</p></div>
+      <div class="row g-3">
+        <sc-for list="{{ achievements }}" as="a" hint-placeholder-count="6">
+          <div class="col-6 col-md-4 col-lg-3">
+            <div class="card border-0 shadow-sm h-100 text-center" style="opacity: {{ a.opacity }};"><div class="card-body py-4">
+              <span class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" style="width:60px;height:60px;background:{{ a.bg }};color:{{ a.color }};"><i class="{{ a.icon }} fs-3"></i></span>
+              <h6 class="mb-1">{{ a.title }}</h6>
+              <p class="text-secondary small mb-0">{{ a.requirement }}</p>
+            </div></div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- ===================== STUDENT: PREMIUM ===================== -->
+    <sc-if value="{{ s_premium }}" hint-placeholder-val="{{ true }}">
+      <div class="text-center mb-4"><h2 class="mb-1">Go Premium</h2><p class="text-secondary mb-0">Unlimited energy, offline lessons and detailed progress insights.</p></div>
+      <div class="row g-3 justify-content-center">
+        <div class="col-12 col-md-5">
+          <div class="card border-0 shadow-sm h-100"><div class="card-body p-4">
+            <h5>Free</h5><div class="fs-2 fw-bold mb-3">$0<span class="fs-6 text-secondary fw-normal">/mo</span></div>
+            <ul class="list-unstyled d-flex flex-column gap-2 mb-4 text-secondary">
+              <li><i class="bi bi-check2 me-2" style="color:#1d8a5b;"></i>All courses &amp; quizzes</li>
+              <li><i class="bi bi-check2 me-2" style="color:#1d8a5b;"></i>5 energy per day</li>
+              <li><i class="bi bi-dash me-2 text-secondary"></i>Limited progress insights</li>
+            </ul>
+            <sc-if value="{{ notPremium }}" hint-placeholder-val="{{ true }}"><button class="btn btn-outline-secondary w-100" disabled>Current plan</button></sc-if>
+            <sc-if value="{{ isPremium }}" hint-placeholder-val="{{ true }}"><button class="btn btn-outline-secondary w-100" onClick="{{ onCancelPremium }}">Switch to Free</button></sc-if>
+          </div></div>
+        </div>
+        <div class="col-12 col-md-5">
+          <div class="card border-0 shadow-sm h-100" style="outline:2px solid #1d4e89;"><div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center"><h5 class="mb-0">Premium</h5>
+              <sc-if value="{{ notPremium }}" hint-placeholder-val="{{ true }}"><span class="badge" style="background:#1d4e89;">Popular</span></sc-if>
+              <sc-if value="{{ isPremium }}" hint-placeholder-val="{{ true }}"><span class="badge text-bg-success">Active</span></sc-if>
+            </div>
+            <div class="fs-2 fw-bold mb-3 mt-2">$9<span class="fs-6 text-secondary fw-normal">/mo</span></div>
+            <ul class="list-unstyled d-flex flex-column gap-2 mb-4">
+              <li><i class="bi bi-check2 me-2" style="color:#1d8a5b;"></i>Everything in Free</li>
+              <li><i class="bi bi-check2 me-2" style="color:#1d8a5b;"></i>Unlimited energy</li>
+              <li><i class="bi bi-check2 me-2" style="color:#1d8a5b;"></i>Detailed progress insights</li>
+              <li><i class="bi bi-check2 me-2" style="color:#1d8a5b;"></i>Offline lessons</li>
+            </ul>
+            <sc-if value="{{ notPremium }}" hint-placeholder-val="{{ true }}"><button class="btn btn-primary w-100" onClick="{{ onUpgrade }}"><i class="bi bi-gem me-1"></i>Upgrade to Premium</button></sc-if>
+            <sc-if value="{{ isPremium }}" hint-placeholder-val="{{ true }}"><button class="btn btn-success w-100" disabled><i class="bi bi-check2 me-1"></i>Your current plan</button></sc-if>
+          </div></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===================== ADMIN: DASHBOARD ===================== -->
+    <sc-if value="{{ a_dashboard }}" hint-placeholder-val="{{ true }}">
+      <div class="mb-4"><h2 class="mb-1">Platform overview</h2><p class="text-secondary mb-0">Engagement and learning metrics across Mathify.</p></div>
+      <div class="row g-3 mb-4">
+        <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+          <div class="col-6 col-lg-3"><div class="card border-0 shadow-sm h-100"><div class="card-body">
+            <div class="text-secondary small fw-semibold mb-1"><i class="{{ k.icon }} me-1"></i>{{ k.label }}</div>
+            <div class="fs-3 fw-bold">{{ k.value }}</div>
+            <div class="small" style="color: {{ k.deltaColor }};">{{ k.delta }}</div>
+          </div></div></div>
+        </sc-for>
+      </div>
+      <div class="row g-3">
+        <div class="col-12 col-lg-6"><div class="card border-0 shadow-sm h-100"><div class="card-body p-4">
+          <h6 class="mb-3">Course popularity</h6>
+          <sc-for list="{{ popularity }}" as="p" hint-placeholder-count="3">
+            <div class="mb-3"><div class="d-flex justify-content-between small mb-1"><span>{{ p.title }}</span><span class="text-secondary">{{ p.count }} learners</span></div>
+            <div class="progress" style="height:8px;"><div class="progress-bar" style="width: {{ p.pct }}%;"></div></div></div>
+          </sc-for>
+        </div></div></div>
+        <div class="col-12 col-lg-6"><div class="card border-0 shadow-sm h-100"><div class="card-body p-4">
+          <h6 class="mb-3">Lesson completion rate</h6>
+          <sc-for list="{{ completion }}" as="p" hint-placeholder-count="3">
+            <div class="mb-3"><div class="d-flex justify-content-between small mb-1"><span>{{ p.title }}</span><span class="text-secondary">{{ p.pct }}%</span></div>
+            <div class="progress" style="height:8px;"><div class="progress-bar" style="width: {{ p.pct }}%;background-color:#1d8a5b;"></div></div></div>
+          </sc-for>
+        </div></div></div>
+      </div>
+    </sc-if>
+
+    <!-- ===================== ADMIN: COURSES (CRUD) ===================== -->
+    <sc-if value="{{ a_courses }}" hint-placeholder-val="{{ true }}">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div><h2 class="mb-1">Courses</h2><p class="text-secondary mb-0">Create, edit and manage course content.</p></div>
+        <button class="btn btn-primary" onClick="{{ onNewCourse }}"><i class="bi bi-plus-lg me-1"></i>New course</button>
+      </div>
+      <div class="card border-0 shadow-sm"><div class="table-responsive"><table class="table align-middle mb-0">
+        <thead style="background:#f6f8fb;"><tr class="text-secondary small">
+          <th class="ps-4">Course</th><th>Category</th><th class="text-center">Chapters</th><th class="text-center">Enrolled</th><th class="text-end pe-4">Actions</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ adminCourses }}" as="c" hint-placeholder-count="3">
+            <tr>
+              <td class="ps-4"><span class="fw-semibold">{{ c.title }}</span><span class="d-block text-secondary small">{{ c.description }}</span></td>
+              <td><span class="badge rounded-pill" style="background:#eef3fa;color:#1d4e89;">{{ c.category }}</span></td>
+              <td class="text-center">{{ c.chapterCount }}</td>
+              <td class="text-center">{{ c.enrolledCount }}</td>
+              <td class="text-end pe-4"><div class="d-inline-flex gap-1">
+                <button class="btn btn-sm btn-primary" onClick="{{ c.onEditContent }}"><i class="bi bi-pencil-square me-1"></i>Content</button>
+                <button class="btn btn-sm btn-outline-secondary" onClick="{{ c.onEdit }}" title="Edit details"><i class="bi bi-gear"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onClick="{{ c.onDelete }}" title="Delete"><i class="bi bi-trash"></i></button>
+              </div></td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table></div></div>
+    </sc-if>
+
+    <!-- ===================== ADMIN: CONTENT EDITOR (CRUD) ===================== -->
+    <sc-if value="{{ a_editor }}" hint-placeholder-val="{{ true }}">
+      <a class="text-secondary small d-inline-flex align-items-center gap-1 mb-3" onClick="{{ onBackToCourses }}" style="cursor:pointer;"><i class="bi bi-arrow-left"></i>Back to courses</a>
+      <div class="card border-0 shadow-sm mb-4"><div class="card-body p-4 d-flex justify-content-between align-items-start flex-wrap gap-3">
+        <div><span class="badge rounded-pill mb-2" style="background:#eef3fa;color:#1d4e89;">{{ ed.category }}</span><h2 class="mb-1">{{ ed.title }}</h2><p class="text-secondary mb-0">{{ ed.description }}</p></div>
+        <button class="btn btn-outline-secondary btn-sm" onClick="{{ ed.onEditDetails }}"><i class="bi bi-gear me-1"></i>Edit details</button>
+      </div></div>
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Chapters</h4>
+        <button class="btn btn-outline-primary btn-sm" onClick="{{ ed.onAddChapter }}"><i class="bi bi-plus-lg me-1"></i>Add chapter</button>
+      </div>
+
+      <sc-for list="{{ ed.chapters }}" as="ch" hint-placeholder-count="2">
+        <div class="card border-0 shadow-sm mb-3"><div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div><div class="text-secondary small fw-semibold">CHAPTER {{ ch.num }} &middot; {{ ch.xpReward }} XP</div><h5 class="mb-0">{{ ch.title }}</h5></div>
+            <div class="d-inline-flex gap-1">
+              <button class="btn btn-sm btn-outline-secondary" onClick="{{ ch.onEdit }}"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onClick="{{ ch.onDelete }}"><i class="bi bi-trash"></i></button>
+            </div>
+          </div>
+          <div class="list-group list-group-flush mb-2">
+            <sc-for list="{{ ch.modules }}" as="m" hint-placeholder-count="2">
+              <div class="list-group-item d-flex align-items-center gap-3 px-2" style="border-color:#eef1f6;">
+                <span class="d-inline-flex align-items-center justify-content-center rounded" style="width:34px;height:34px;background:#eef3fa;color:#1d4e89;"><i class="{{ m.icon }}"></i></span>
+                <span class="flex-grow-1"><span class="fw-semibold d-block">{{ m.title }}</span><span class="text-secondary small">{{ m.meta }}</span></span>
+                <button class="btn btn-sm btn-outline-secondary" onClick="{{ m.onEdit }}"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onClick="{{ m.onDelete }}"><i class="bi bi-trash"></i></button>
+              </div>
+            </sc-for>
+            <sc-for list="{{ ch.quizzes }}" as="q" hint-placeholder-count="1">
+              <div class="list-group-item d-flex align-items-center gap-3 px-2" style="border-color:#eef1f6;">
+                <span class="d-inline-flex align-items-center justify-content-center rounded" style="width:34px;height:34px;background:#fdf3e3;color:#b9761b;"><i class="bi bi-patch-question-fill"></i></span>
+                <span class="flex-grow-1" style="cursor:pointer;" onClick="{{ q.onQuestions }}"><span class="fw-semibold d-block">{{ q.title }}</span><span class="text-secondary small">Quiz &middot; pass {{ q.passingScore }}% &middot; {{ q.count }} questions</span></span>
+                <button class="btn btn-sm btn-primary" onClick="{{ q.onQuestions }}"><i class="bi bi-list-check me-1"></i>Questions</button>
+                <button class="btn btn-sm btn-outline-secondary" onClick="{{ q.onEdit }}" title="Edit quiz details"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger" onClick="{{ q.onDelete }}"><i class="bi bi-trash"></i></button>
+              </div>
+            </sc-for>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-light" onClick="{{ ch.onAddModule }}"><i class="bi bi-plus-lg me-1"></i>Module</button>
+            <button class="btn btn-sm btn-light" onClick="{{ ch.onAddQuiz }}"><i class="bi bi-plus-lg me-1"></i>Quiz</button>
+          </div>
+        </div></div>
+      </sc-for>
+    </sc-if>
+
+    <!-- ===================== ADMIN: QUIZ EDITOR (QUESTIONS CRUD) ===================== -->
+    <sc-if value="{{ a_quizedit }}" hint-placeholder-val="{{ true }}">
+      <a class="text-secondary small d-inline-flex align-items-center gap-1 mb-3" onClick="{{ qe.onBack }}" style="cursor:pointer;"><i class="bi bi-arrow-left"></i>Back to course content</a>
+      <div class="card border-0 shadow-sm mb-4"><div class="card-body p-4 d-flex justify-content-between align-items-start flex-wrap gap-3">
+        <div>
+          <div class="text-secondary small fw-semibold">QUIZ &middot; {{ qe.chapterTitle }}</div>
+          <h2 class="mb-1">{{ qe.title }}</h2>
+          <span class="badge rounded-pill" style="background:#fdf3e3;color:#b9761b;">Passing score {{ qe.passingScore }}%</span>
+        </div>
+        <button class="btn btn-outline-secondary btn-sm" onClick="{{ qe.onEditShell }}"><i class="bi bi-gear me-1"></i>Edit details</button>
+      </div></div>
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Questions</h4>
+        <button class="btn btn-primary btn-sm" onClick="{{ qe.onAddQuestion }}"><i class="bi bi-plus-lg me-1"></i>Add question</button>
+      </div>
+
+      <sc-if value="{{ qe.hasQuestions }}" hint-placeholder-val="{{ true }}">
+        <sc-for list="{{ qe.questions }}" as="q" hint-placeholder-count="2">
+          <div class="card border-0 shadow-sm mb-2"><div class="card-body p-3 d-flex align-items-start gap-3">
+            <span class="badge rounded-pill mt-1" style="background: {{ q.bg }};color: {{ q.color }};flex:none;">{{ q.typeLabel }}</span>
+            <div class="flex-grow-1">
+              <div class="fw-semibold">{{ q.num }}. {{ q.prompt }}</div>
+              <div class="text-secondary small">{{ q.meta }} &middot; {{ q.points }} pts</div>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary" onClick="{{ q.onEdit }}"><i class="bi bi-pencil"></i></button>
+            <button class="btn btn-sm btn-outline-danger" onClick="{{ q.onDelete }}"><i class="bi bi-trash"></i></button>
+          </div></div>
+        </sc-for>
+      </sc-if>
+      <sc-if value="{{ qe.noQuestions }}" hint-placeholder-val="{{ true }}">
+        <div class="card border-0 shadow-sm"><div class="card-body text-center py-5 text-secondary">
+          <i class="bi bi-question-circle fs-1"></i>
+          <p class="mt-2 mb-0">No questions yet. Add your first one to build the quiz.</p>
+        </div></div>
+      </sc-if>
+    </sc-if>
+
+    <!-- ===================== ADMIN: STUDENTS ===================== -->
+    <sc-if value="{{ a_students }}" hint-placeholder-val="{{ true }}">
+      <div class="mb-4"><h2 class="mb-1">Students</h2><p class="text-secondary mb-0">Manage learner accounts.</p></div>
+      <div class="card border-0 shadow-sm"><div class="table-responsive"><table class="table align-middle mb-0">
+        <thead style="background:#f6f8fb;"><tr class="text-secondary small">
+          <th class="ps-4">Name</th><th>Email</th><th>Plan</th><th class="text-center">XP</th><th>Status</th><th class="text-end pe-4">Actions</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ students }}" as="s" hint-placeholder-count="4">
+            <tr>
+              <td class="ps-4 fw-semibold">{{ s.name }}</td>
+              <td class="text-secondary">{{ s.email }}</td>
+              <td><span class="{{ s.planCls }}">{{ s.plan }}</span></td>
+              <td class="text-center">{{ s.xp }}</td>
+              <td><span class="{{ s.statusCls }}">{{ s.status }}</span></td>
+              <td class="text-end pe-4"><div class="d-inline-flex gap-1">
+                <button class="btn btn-sm btn-outline-secondary" onClick="{{ s.onToggle }}">{{ s.toggleLabel }}</button>
+                <button class="btn btn-sm btn-outline-danger" onClick="{{ s.onDelete }}"><i class="bi bi-trash"></i></button>
+              </div></td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table></div></div>
+    </sc-if>
+
+  </div>
+
+  <!-- ===================== MODAL ===================== -->
+  <sc-if value="{{ hasModal }}" hint-placeholder-val="{{ true }}">
+    <div style="position:fixed;inset:0;background:rgba(20,30,45,.45);z-index:1050;display:flex;align-items:flex-start;justify-content:center;padding:60px 16px;overflow:auto;" onClick="{{ modal.onBackdrop }}">
+      <div class="card border-0 shadow" style="width:100%;max-width: {{ modal.maxw }};" onClick="{{ modal.stop }}">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="mb-0">{{ modal.title }}</h5><button class="btn-close" onClick="{{ modal.onClose }}"></button></div>
+
+          <sc-if value="{{ modal.isCourse }}" hint-placeholder-val="{{ true }}">
+            <div class="mb-3"><label class="form-label small fw-semibold">Title</label><input class="form-control" value="{{ modal.form.title }}" onChange="{{ modal.set_title }}"></div>
+            <div class="mb-3"><label class="form-label small fw-semibold">Category</label><input class="form-control" value="{{ modal.form.category }}" onChange="{{ modal.set_category }}"></div>
+            <div class="mb-3"><label class="form-label small fw-semibold">Description</label><textarea class="form-control" rows="3" onChange="{{ modal.set_description }}">{{ modal.form.description }}</textarea></div>
+          </sc-if>
+
+          <sc-if value="{{ modal.isChapter }}" hint-placeholder-val="{{ true }}">
+            <div class="mb-3"><label class="form-label small fw-semibold">Title</label><input class="form-control" value="{{ modal.form.title }}" onChange="{{ modal.set_title }}"></div>
+            <div class="mb-3"><label class="form-label small fw-semibold">Description</label><textarea class="form-control" rows="2" onChange="{{ modal.set_description }}">{{ modal.form.description }}</textarea></div>
+            <div class="mb-3"><label class="form-label small fw-semibold">XP reward</label><input class="form-control" type="number" value="{{ modal.form.xpReward }}" onChange="{{ modal.set_xpReward }}"></div>
+          </sc-if>
+
+          <sc-if value="{{ modal.isModule }}" hint-placeholder-val="{{ true }}">
+            <div class="mb-3"><label class="form-label small fw-semibold">Title</label><input class="form-control" value="{{ modal.form.title }}" onChange="{{ modal.set_title }}"></div>
+            <div class="mb-3"><label class="form-label small fw-semibold">Type</label>
+              <select class="form-select" value="{{ modal.form.type }}" onChange="{{ modal.set_type }}"><option value="VIDEO">Video</option><option value="SLIDE">Slide</option></select></div>
+            <div class="mb-3"><label class="form-label small fw-semibold">{{ modal.metaLabel }}</label><input class="form-control" value="{{ modal.form.meta }}" onChange="{{ modal.set_meta }}"></div>
+            <div class="mb-3"><label class="form-label small fw-semibold">{{ modal.urlLabel }}</label><input class="form-control" type="url" placeholder="https://\u2026" value="{{ modal.form.url }}" onChange="{{ modal.set_url }}"><div class="form-text">Link learners open for this lesson.</div></div>
+          </sc-if>
+
+          <sc-if value="{{ modal.isQuiz }}" hint-placeholder-val="{{ true }}">
+            <div class="mb-3"><label class="form-label small fw-semibold">Title</label><input class="form-control" value="{{ modal.form.title }}" onChange="{{ modal.set_title }}"></div>
+            <div class="mb-3"><label class="form-label small fw-semibold">Passing score (%)</label><input class="form-control" type="number" value="{{ modal.form.passingScore }}" onChange="{{ modal.set_passingScore }}"></div>
+          </sc-if>
+
+          <sc-if value="{{ modal.isQuestion }}" hint-placeholder-val="{{ true }}">
+            <div class="mb-3"><label class="form-label small fw-semibold">Question type</label>
+              <select class="form-select" value="{{ modal.form.type }}" onChange="{{ modal.set_qtype }}">
+                <option value="MULTIPLE_CHOICE">Multiple choice</option>
+                <option value="FILL_BLANK">Fill in the blank</option>
+                <option value="DRAG_AND_DROP">Match pairs</option>
+              </select></div>
+            <div class="mb-3"><label class="form-label small fw-semibold">Prompt</label><textarea class="form-control" rows="2" value="{{ modal.form.prompt }}" onChange="{{ modal.set_prompt }}"></textarea></div>
+            <div class="mb-3" style="max-width:150px;"><label class="form-label small fw-semibold">Points</label><input class="form-control" type="number" value="{{ modal.form.points }}" onChange="{{ modal.set_points }}"></div>
+
+            <sc-if value="{{ modal.q_isMC }}" hint-placeholder-val="{{ true }}">
+              <label class="form-label small fw-semibold mb-2">Options <span class="text-secondary fw-normal">&mdash; tick the correct answer(s)</span></label>
+              <sc-for list="{{ modal.optionRows }}" as="o" hint-placeholder-count="3">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <input class="form-check-input mt-0" type="checkbox" checked="{{ o.correct }}" onChange="{{ o.onToggle }}" style="flex:none;">
+                  <input class="form-control" value="{{ o.text }}" onChange="{{ o.onText }}" placeholder="Option text">
+                  <button class="btn btn-sm btn-outline-secondary" style="flex:none;" onClick="{{ o.onRemove }}"><i class="bi bi-x-lg"></i></button>
+                </div>
+              </sc-for>
+              <button class="btn btn-sm btn-light" onClick="{{ modal.q_addOption }}"><i class="bi bi-plus-lg me-1"></i>Add option</button>
+            </sc-if>
+
+            <sc-if value="{{ modal.q_isFill }}" hint-placeholder-val="{{ true }}">
+              <label class="form-label small fw-semibold mb-2">Accepted answers</label>
+              <sc-for list="{{ modal.answerRows }}" as="a" hint-placeholder-count="1">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <input class="form-control" value="{{ a.text }}" onChange="{{ a.onText }}" placeholder="e.g. 5">
+                  <button class="btn btn-sm btn-outline-secondary" style="flex:none;" onClick="{{ a.onRemove }}"><i class="bi bi-x-lg"></i></button>
+                </div>
+              </sc-for>
+              <button class="btn btn-sm btn-light" onClick="{{ modal.q_addAnswer }}"><i class="bi bi-plus-lg me-1"></i>Add answer</button>
+              <div class="form-check mt-3"><input class="form-check-input" type="checkbox" id="csbox" checked="{{ modal.form.caseSensitive }}" onChange="{{ modal.set_caseSensitive }}"><label class="form-check-label small" for="csbox">Case sensitive</label></div>
+            </sc-if>
+
+            <sc-if value="{{ modal.q_isDnd }}" hint-placeholder-val="{{ true }}">
+              <label class="form-label small fw-semibold mb-2">Pairs to match</label>
+              <sc-for list="{{ modal.pairRows }}" as="p" hint-placeholder-count="2">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <input class="form-control" value="{{ p.term }}" onChange="{{ p.onTerm }}" placeholder="Term">
+                  <i class="bi bi-arrow-right text-secondary" style="flex:none;"></i>
+                  <input class="form-control" value="{{ p.match }}" onChange="{{ p.onMatch }}" placeholder="Matches with">
+                  <button class="btn btn-sm btn-outline-secondary" style="flex:none;" onClick="{{ p.onRemove }}"><i class="bi bi-x-lg"></i></button>
+                </div>
+              </sc-for>
+              <button class="btn btn-sm btn-light" onClick="{{ modal.q_addPair }}"><i class="bi bi-plus-lg me-1"></i>Add pair</button>
+            </sc-if>
+          </sc-if>
+
+          <div class="d-flex justify-content-end gap-2 mt-2">
+            <button class="btn btn-outline-secondary" onClick="{{ modal.onClose }}">Cancel</button>
+            <button class="btn btn-primary" onClick="{{ modal.onSave }}">{{ modal.saveLabel }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:860}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    let n = 0; const id = (p) => p + (++n);
+    const mkMC = (prompt, opts, correct, pts) => ({ id:id('q'), type:'MULTIPLE_CHOICE', prompt, points:pts||10, options:opts.map((t,i)=>({id:'o'+i,text:t})), correct });
+    const mkFill = (prompt, answers, pts) => ({ id:id('q'), type:'FILL_BLANK', prompt, points:pts||10, answers, caseSensitive:false });
+    const mkDnd = (prompt, draggables, zones, pairings, pts) => ({ id:id('q'), type:'DRAG_AND_DROP', prompt, points:pts||15, draggables, zones, pairings });
+
+    const courses = [
+      { id:'c1', title:'Algebra Foundations', category:'Algebra',
+        description:'Build fluency with variables, expressions and linear equations from the ground up.',
+        chapters:[
+          { id:'c1a', title:'Variables & Expressions', description:'Translate words into algebraic expressions.', xpReward:50,
+            modules:[ {id:'m1',title:'What is a Variable?',type:'VIDEO',duration:'7:40',url:'https://www.youtube.com/watch?v=vDqOoI-4Z6M'}, {id:'m2',title:'Building Expressions',type:'SLIDE',slides:6,url:'https://docs.google.com/presentation/'} ],
+            quizzes:[ {id:'q1',title:'Expressions Check',passingScore:70,questions:[
+              mkMC('Which expression means "5 more than a number n"?', ['n - 5','5n','n + 5','5 / n'], ['o2']),
+              mkFill('Simplify: 3x + 2x = ___ x', ['5']),
+              mkDnd('Match each phrase to its expression.',
+                [{id:'d1',text:'twice y'},{id:'d2',text:'y less 3'},{id:'d3',text:'y squared'}],
+                [{id:'z1',label:'2y'},{id:'z2',label:'y - 3'},{id:'z3',label:'y\u00B2'}],
+                {z1:'d1',z2:'d2',z3:'d3'}) ]} ] },
+          { id:'c1b', title:'Linear Equations', description:'Solve one- and two-step equations.', xpReward:80,
+            modules:[ {id:'m3',title:'Solving for x',type:'VIDEO',duration:'9:10'} ],
+            quizzes:[ {id:'q2',title:'Equations Quiz',passingScore:75,questions:[
+              mkMC('Solve: x + 7 = 12', ['3','5','7','19'], ['o1']),
+              mkFill('Solve for x: 2x = 10, x = ___', ['5']) ]} ] }
+        ] },
+      { id:'c2', title:'Geometry Essentials', category:'Geometry',
+        description:'Angles, triangles and the properties that shape the plane.',
+        chapters:[
+          { id:'c2a', title:'Angles & Lines', description:'Acute, obtuse and the rules they follow.', xpReward:60,
+            modules:[ {id:'m4',title:'Naming Angles',type:'SLIDE',slides:8}, {id:'m5',title:'Parallel Lines',type:'VIDEO',duration:'6:30'} ],
+            quizzes:[ {id:'q3',title:'Angles Quiz',passingScore:70,questions:[
+              mkMC('Angles on a straight line sum to:', ['90\u00B0','180\u00B0','270\u00B0','360\u00B0'], ['o1']) ]} ] }
+        ] },
+      { id:'c3', title:'Calculus Kickstart', category:'Calculus',
+        description:'A gentle on-ramp to limits and the idea of the derivative.',
+        chapters:[
+          { id:'c3a', title:'Understanding Limits', description:'What it means to approach a value.', xpReward:90,
+            modules:[ {id:'m6',title:'Intuition for Limits',type:'VIDEO',duration:'11:20'} ],
+            quizzes:[ {id:'q4',title:'Limits Quiz',passingScore:80,questions:[
+              mkMC('The limit describes a function\u2019s behavior as x:', ['equals a value','approaches a value','is undefined','is zero'], ['o1']) ]} ] }
+        ] }
+    ];
+
+    const students = [
+      { id:'s1', name:'Maya Chen', email:'maya@school.edu', plan:'Premium', xp:2480, status:'Active' },
+      { id:'s2', name:'Liam Patel', email:'liam@school.edu', plan:'Free', xp:640, status:'Active' },
+      { id:'s3', name:'Sofia Rossi', email:'sofia@school.edu', plan:'Free', xp:1120, status:'Active' },
+      { id:'s4', name:'Noah Kim', email:'noah@school.edu', plan:'Premium', xp:3050, status:'Disabled' }
+    ];
+
+    this.state = {
+      role:'student', screen:'dashboard',
+      curCourse:null, curChapter:null, curModule:null, curQuiz:null, slideIndex:0,
+      enrollments:{ c1:{progress:45}, c2:{progress:15} },
+      profile:{ name:'Alex Rivera', level:4, totalXP:1240, xpInLevel:240, xpPerLevel:500, streak:12, energy:4, energyMax:5, premium:false },
+      quiz:null,
+      courses, students,
+      enrolledCounts:{ c1:312, c2:189, c3:97 },
+      modal:null,
+      _ids:n
+    };
+  }
+
+  /* ---------- helpers ---------- */
+  nextId(p){ const v=(this.state._ids||0)+1; this.setState({_ids:v}); return p+v; }
+  course(cid){ return this.state.courses.find(c=>c.id===cid); }
+  go(screen){ this.setState({screen, quiz: screen==='quiz'?this.state.quiz:null}); window.scrollTo(0,0); }
+  setRole(role){ this.setState({role, screen: role==='admin'?'a_dashboard':'dashboard', quiz:null}); window.scrollTo(0,0); }
+
+  openCourse(cid){ this.setState({curCourse:cid, screen:'course'}); window.scrollTo(0,0); }
+  enroll(cid){ this.setState(s=>({enrollments:{...s.enrollments,[cid]:{progress:0}}, enrolledCounts:{...s.enrolledCounts,[cid]:(s.enrolledCounts[cid]||0)+1}})); }
+  unenroll(cid){ this.setState(s=>{ const e={...s.enrollments}; delete e[cid]; const c={...s.enrolledCounts}; c[cid]=Math.max(0,(c[cid]||1)-1); return {enrollments:e, enrolledCounts:c}; }); }
+
+  openModule(cid,chid,mid){ this.setState({curCourse:cid,curChapter:chid,curModule:mid,slideIndex:0,screen:'module'}); window.scrollTo(0,0); }
+  completeModule(){
+    const cid=this.state.curCourse;
+    this.setState(s=>{ const en=s.enrollments[cid]; if(en){ en.progress=Math.min(100,en.progress+15);} const p={...s.profile, totalXP:s.profile.totalXP+20, xpInLevel:Math.min(s.profile.xpPerLevel,s.profile.xpInLevel+20)}; return {enrollments:{...s.enrollments}, profile:p, screen:'course'}; });
+    window.scrollTo(0,0);
+  }
+
+  startQuiz(cid,chid,qid){
+    const ch=this.course(cid).chapters.find(c=>c.id===chid);
+    const qz=ch.quizzes.find(q=>q.id===qid);
+    this.setState({curCourse:cid,curChapter:chid,screen:'quiz',
+      quiz:{ quizId:qid, title:qz.title, passingScore:qz.passingScore, questions:qz.questions, qIndex:0, answers:{}, done:false, score:0, dndPick:null }});
+    window.scrollTo(0,0);
+  }
+  pickMC(qid,oid){ this.setState(s=>{ const a={...s.quiz.answers}; a[qid]=[oid]; return {quiz:{...s.quiz,answers:a}}; }); }
+  setFill(qid,val){ this.setState(s=>{ const a={...s.quiz.answers}; a[qid]=val; return {quiz:{...s.quiz,answers:a}}; }); }
+  pickDnd(did){ this.setState(s=>({quiz:{...s.quiz, dndPick: s.quiz.dndPick===did?null:did}})); }
+  dropDnd(qid,zoneId){ this.setState(s=>{ const q={...s.quiz}; const a={...q.answers}; const cur={...(a[qid]||{})};
+    if(cur[zoneId]){ delete cur[zoneId]; } else if(q.dndPick){ for(const z in cur){ if(cur[z]===q.dndPick) delete cur[z]; } cur[zoneId]=q.dndPick; q.dndPick=null; }
+    a[qid]=cur; q.answers=a; return {quiz:q}; }); }
+  evalQuestion(q,ans){
+    if(q.type==='MULTIPLE_CHOICE'){ return ans && q.correct.every(c=>ans.includes(c)) && ans.length===q.correct.length; }
+    if(q.type==='FILL_BLANK'){ if(!ans) return false; const norm=v=>q.caseSensitive?String(v).trim():String(v).trim().toLowerCase(); return q.answers.some(a=>norm(a)===norm(ans)); }
+    if(q.type==='DRAG_AND_DROP'){ if(!ans) return false; return Object.keys(q.pairings).every(z=>ans[z]===q.pairings[z]); }
+    return false;
+  }
+  nextQuestion(){
+    const q=this.state.quiz;
+    if(q.qIndex < q.questions.length-1){ this.setState({quiz:{...q,qIndex:q.qIndex+1,dndPick:null}}); }
+    else {
+      let got=0, tot=0;
+      q.questions.forEach(qq=>{ tot+=qq.points; if(this.evalQuestion(qq,q.answers[qq.id])) got+=qq.points; });
+      const pct=Math.round(got/tot*100);
+      const passed=pct>=q.passingScore;
+      if(passed){ this.setState(s=>({profile:{...s.profile,totalXP:s.profile.totalXP+got}})); }
+      this.setState(s=>({quiz:{...s.quiz,done:true,score:pct,xpEarned:got,passed}}));
+    }
+    window.scrollTo(0,0);
+  }
+  retryQuiz(){ this.setState(s=>({quiz:{...s.quiz,qIndex:0,answers:{},done:false,dndPick:null}})); window.scrollTo(0,0); }
+
+  /* ---------- admin CRUD ---------- */
+  openEditor(cid){ this.setState({curCourse:cid, screen:'a_editor'}); window.scrollTo(0,0); }
+  openQuizEditor(cid,chid,qid){ this.setState({curCourse:cid,curChapter:chid,curQuiz:qid,screen:'a_quizedit'}); window.scrollTo(0,0); }
+  deleteQuestion(cid,chid,qid,questionId){ if(window.confirm('Delete this question?')) this.mutateCourse(cid,c=>{ const qz=c.chapters.find(x=>x.id===chid).quizzes.find(x=>x.id===qid); qz.questions=qz.questions.filter(x=>x.id!==questionId); }); }
+  updForm(fn){ this.setState(s=>{ const form=JSON.parse(JSON.stringify(s.modal.form)); fn(form); return {modal:{...s.modal,form}}; }); }
+  newQuestionForm(){ return {type:'MULTIPLE_CHOICE',prompt:'',points:10,options:[{text:'',correct:false},{text:'',correct:false},{text:'',correct:false}],answers:[''],pairs:[{term:'',match:''},{term:'',match:''}],caseSensitive:false}; }
+  setQType(val){ this.updForm(f=>{ f.type=val; if(val==='MULTIPLE_CHOICE'&&(!f.options||!f.options.length)) f.options=[{text:'',correct:false},{text:'',correct:false}]; if(val==='FILL_BLANK'&&(!f.answers||!f.answers.length)) f.answers=['']; if(val==='DRAG_AND_DROP'&&(!f.pairs||!f.pairs.length)) f.pairs=[{term:'',match:''},{term:'',match:''}]; }); }
+  buildQuestion(f){
+    const id=this.nextId('q'); const points=Number(f.points)||10; const prompt=f.prompt||'';
+    if(f.type==='MULTIPLE_CHOICE'){ const kept=(f.options||[]).filter(o=>o.text&&o.text.trim()); const options=kept.map((o,i)=>({id:'o'+i,text:o.text})); const correct=kept.map((o,i)=>o.correct?'o'+i:null).filter(Boolean); return {id,type:'MULTIPLE_CHOICE',prompt,points,options,correct}; }
+    if(f.type==='FILL_BLANK'){ return {id,type:'FILL_BLANK',prompt,points,answers:(f.answers||[]).filter(a=>a&&a.trim()),caseSensitive:!!f.caseSensitive}; }
+    const pairs=(f.pairs||[]).filter(p=>p.term&&p.term.trim()&&p.match&&p.match.trim());
+    const draggables=pairs.map((p,i)=>({id:'d'+i,text:p.term})); const zones=pairs.map((p,i)=>({id:'z'+i,label:p.match})); const pairings={}; pairs.forEach((p,i)=>{pairings['z'+i]='d'+i;});
+    return {id,type:'DRAG_AND_DROP',prompt,points,draggables,zones,pairings};
+  }
+  questionToForm(q){
+    const base={type:q.type,prompt:q.prompt,points:q.points,options:[{text:'',correct:false},{text:'',correct:false}],answers:[''],pairs:[{term:'',match:''},{term:'',match:''}],caseSensitive:false};
+    if(q.type==='MULTIPLE_CHOICE'){ base.options=q.options.map(o=>({text:o.text,correct:q.correct.includes(o.id)})); }
+    else if(q.type==='FILL_BLANK'){ base.answers=[...q.answers]; base.caseSensitive=!!q.caseSensitive; }
+    else { base.pairs=q.zones.map(z=>{ const d=q.draggables.find(x=>x.id===q.pairings[z.id]); return {term:d?d.text:'',match:z.label}; }); }
+    return base;
+  }
+  toggleStudent(sid){ this.setState(s=>({students:s.students.map(st=>st.id===sid?{...st,status:st.status==='Active'?'Disabled':'Active'}:st)})); }
+  deleteStudent(sid){ if(window.confirm('Delete this student account permanently?')) this.setState(s=>({students:s.students.filter(st=>st.id!==sid)})); }
+  deleteCourse(cid){ if(window.confirm('Delete this course and all its content?')) this.setState(s=>({courses:s.courses.filter(c=>c.id!==cid)})); }
+  deleteChapter(cid,chid){ if(window.confirm('Delete this chapter?')) this.mutateCourse(cid,c=>{c.chapters=c.chapters.filter(x=>x.id!==chid);}); }
+  deleteModule(cid,chid,mid){ if(window.confirm('Delete this module?')) this.mutateCourse(cid,c=>{const ch=c.chapters.find(x=>x.id===chid); ch.modules=ch.modules.filter(x=>x.id!==mid);}); }
+  deleteQuiz(cid,chid,qid){ if(window.confirm('Delete this quiz?')) this.mutateCourse(cid,c=>{const ch=c.chapters.find(x=>x.id===chid); ch.quizzes=ch.quizzes.filter(x=>x.id!==qid);}); }
+  mutateCourse(cid,fn){ this.setState(s=>{ const courses=s.courses.map(c=>{ if(c.id!==cid) return c; const cc={...c,chapters:c.chapters.map(ch=>({...ch,modules:[...ch.modules],quizzes:[...ch.quizzes]}))}; fn(cc); return cc; }); return {courses}; }); }
+
+  /* ---------- modal ---------- */
+  openModal(m){ this.setState({modal:m}); }
+  closeModal(){ this.setState({modal:null}); }
+  setForm(field,val){ this.setState(s=>({modal:{...s.modal, form:{...s.modal.form,[field]:val}}})); }
+  saveModal(){
+    const m=this.state.modal; const f=m.form;
+    if(m.kind==='course'){
+      if(m.mode==='create'){ const nc={id:this.nextId('c'),title:f.title||'Untitled course',category:f.category||'General',description:f.description||'',chapters:[]}; this.setState(s=>({courses:[...s.courses,nc]})); }
+      else { this.mutateCourse(m.courseId,c=>{c.title=f.title;c.category=f.category;c.description=f.description;}); }
+    } else if(m.kind==='chapter'){
+      if(m.mode==='create'){ const nch={id:this.nextId('ch'),title:f.title||'New chapter',description:f.description||'',xpReward:Number(f.xpReward)||50,modules:[],quizzes:[]}; this.mutateCourse(m.courseId,c=>{c.chapters.push(nch);}); }
+      else { this.mutateCourse(m.courseId,c=>{const ch=c.chapters.find(x=>x.id===m.chapterId); ch.title=f.title; ch.description=f.description; ch.xpReward=Number(f.xpReward)||0;}); }
+    } else if(m.kind==='module'){
+      const meta=f.meta||''; const isV=f.type==='VIDEO'; const url=f.url||'';
+      if(m.mode==='create'){ const nm={id:this.nextId('m'),title:f.title||'New module',type:f.type||'VIDEO',url}; if(isV) nm.duration=meta||'5:00'; else nm.slides=Number(meta)||5; this.mutateCourse(m.courseId,c=>{c.chapters.find(x=>x.id===m.chapterId).modules.push(nm);}); }
+      else { this.mutateCourse(m.courseId,c=>{const md=c.chapters.find(x=>x.id===m.chapterId).modules.find(x=>x.id===m.moduleId); md.title=f.title; md.type=f.type; md.url=url; if(f.type==='VIDEO'){md.duration=meta;delete md.slides;} else {md.slides=Number(meta)||5;delete md.duration;}}); }
+    } else if(m.kind==='quiz'){
+      if(m.mode==='create'){ const nq={id:this.nextId('q'),title:f.title||'New quiz',passingScore:Number(f.passingScore)||70,questions:[]}; this.mutateCourse(m.courseId,c=>{c.chapters.find(x=>x.id===m.chapterId).quizzes.push(nq);}); }
+      else { this.mutateCourse(m.courseId,c=>{const qz=c.chapters.find(x=>x.id===m.chapterId).quizzes.find(x=>x.id===m.quizId); qz.title=f.title; qz.passingScore=Number(f.passingScore)||0;}); }
+    } else if(m.kind==='question'){
+      const q=this.buildQuestion(f);
+      this.mutateCourse(m.courseId,c=>{ const qz=c.chapters.find(x=>x.id===m.chapterId).quizzes.find(x=>x.id===m.quizId);
+        if(m.mode==='create'){ qz.questions.push(q); } else { q.id=m.questionId; const idx=qz.questions.findIndex(x=>x.id===m.questionId); qz.questions[idx]=q; } });
+    }
+    this.setState({modal:null});
+  }
+
+  /* ---------- render ---------- */
+  renderVals(){
+    const st=this.state, p=st.profile, role=st.role, screen=st.screen;
+    const enrolledIds=Object.keys(st.enrollments);
+    const isStudent=role==='student';
+
+    // nav
+    const studentNav=[['dashboard','Dashboard','bi bi-house-door'],['catalog','Courses','bi bi-grid'],['achievements','Achievements','bi bi-trophy'],['premium','Premium','bi bi-gem']];
+    const adminNav=[['a_dashboard','Overview','bi bi-graph-up-arrow'],['a_courses','Courses','bi bi-mortarboard'],['a_students','Students','bi bi-people']];
+    const navSrc=isStudent?studentNav:adminNav;
+    const navItems=navSrc.map(([key,label,icon])=>({label,icon,cls:'nav-link px-3'+(screen===key?' active':''),go:()=>this.go(key)}));
+
+    const vals={
+      isStudent,
+      navItems,
+      avatarInitials: isStudent? p.name.split(' ').map(w=>w[0]).join('') : 'AD',
+      roleStudentCls:'btn '+(isStudent?'btn-primary':'btn-outline-secondary'),
+      roleAdminCls:'btn '+(!isStudent?'btn-primary':'btn-outline-secondary'),
+      setStudent:()=>this.setRole('student'),
+      setAdmin:()=>this.setRole('admin'),
+      goCatalog:()=>this.go('catalog'),
+      goPremiumCta:()=>this.go('premium'),
+      isPremium:p.premium, notPremium:!p.premium,
+      onUpgrade:()=>this.setState(s=>({profile:{...s.profile,premium:true}})),
+      onCancelPremium:()=>this.setState(s=>({profile:{...s.profile,premium:false}})),
+      // screen flags
+      s_dashboard:isStudent&&screen==='dashboard',
+      s_catalog:isStudent&&screen==='catalog',
+      s_course:isStudent&&screen==='course',
+      s_module:isStudent&&screen==='module',
+      s_quiz:isStudent&&screen==='quiz',
+      s_achievements:isStudent&&screen==='achievements',
+      s_premium:isStudent&&screen==='premium',
+      a_dashboard:!isStudent&&screen==='a_dashboard',
+      a_courses:!isStudent&&screen==='a_courses',
+      a_editor:!isStudent&&screen==='a_editor',
+      a_quizedit:!isStudent&&screen==='a_quizedit',
+      a_students:!isStudent&&screen==='a_students',
+      profile:{
+        firstName:p.name.split(' ')[0], name:p.name, level:p.level, nextLevel:p.level+1,
+        totalXP:p.totalXP, streak:p.streak, energyLabel: p.premium?'\u221E':(p.energy+'/'+p.energyMax),
+        xpInLevel:p.xpInLevel, xpPerLevel:p.xpPerLevel, levelPct:Math.round(p.xpInLevel/p.xpPerLevel*100),
+        xpToNext:p.xpPerLevel-p.xpInLevel, completedCount:enrolledIds.filter(id=>st.enrollments[id].progress>=100).length
+      },
+    };
+
+    // dashboard enrolled
+    vals.hasEnrollments=enrolledIds.length>0;
+    vals.noEnrollments=enrolledIds.length===0;
+    vals.enrolledCourses=enrolledIds.map(id=>{ const c=this.course(id); return c?{category:c.category,title:c.title,progress:st.enrollments[id].progress,onOpen:()=>this.openCourse(id)}:null; }).filter(Boolean);
+
+    // catalog
+    vals.catalog=st.courses.map(c=>{ const enrolled=!!st.enrollments[c.id]; return {
+      category:c.category, title:c.title, description:c.description,
+      chapterCount:c.chapters.length, enrolledCount:st.enrolledCounts[c.id]||0,
+      enrolled, notEnrolled:!enrolled,
+      onOpen:()=>this.openCourse(c.id), onEnroll:()=>this.enroll(c.id), onUnenroll:()=>this.unenroll(c.id)
+    }; });
+
+    // course detail
+    if(screen==='course'||screen==='module'||screen==='quiz'){
+      const c=this.course(st.curCourse);
+      if(c){
+        const enrolled=!!st.enrollments[c.id];
+        vals.cur={ category:c.category, title:c.title, description:c.description, enrolled, notEnrolled:!enrolled,
+          onEnroll:()=>this.enroll(c.id), onUnenroll:()=>this.unenroll(c.id),
+          chapters:c.chapters.map((ch,i)=>({ num:i+1, title:ch.title, xpReward:ch.xpReward,
+            modules:ch.modules.map(m=>({ title:m.title, icon:m.type==='VIDEO'?'bi bi-play-circle-fill':'bi bi-easel-fill',
+              meta:m.type==='VIDEO'?('Video \u00B7 '+m.duration):('Slides \u00B7 '+m.slides+' slides'),
+              lockIcon:enrolled?'bi bi-chevron-right':'bi bi-lock-fill',
+              onOpen:()=> enrolled? this.openModule(c.id,ch.id,m.id):this.enroll(c.id) })),
+            quizzes:ch.quizzes.map(q=>({ title:q.title, passingScore:q.passingScore, count:q.questions.length,
+              lockIcon:enrolled?'bi bi-chevron-right':'bi bi-lock-fill',
+              onStart:()=> enrolled? this.startQuiz(c.id,ch.id,q.id):this.enroll(c.id) })) }))
+        };
+      }
+    }
+
+    // module viewer
+    if(screen==='module'){
+      const c=this.course(st.curCourse); const ch=c&&c.chapters.find(x=>x.id===st.curChapter); const m=ch&&ch.modules.find(x=>x.id===st.curModule);
+      if(m){ const isV=m.type==='VIDEO'; const totalSlides=m.slides||1;
+        vals.mod={ courseTitle:c.title, kindLabel:isV?'VIDEO LESSON':'SLIDE LESSON', title:m.title,
+          url:m.url||'', hasUrl:!!m.url, noUrl:!m.url, linkLabel:isV?'Open video':'Open slides',
+          isVideo:isV, isSlide:!isV, meta:isV?m.duration:String(totalSlides),
+          slideNum:Math.min(st.slideIndex+1,totalSlides), xp:20,
+          onBack:()=>this.openCourse(c.id), onComplete:()=>this.completeModule(),
+          prevSlide:()=>this.setState(s=>({slideIndex:Math.max(0,s.slideIndex-1)})),
+          nextSlide:()=>this.setState(s=>({slideIndex:Math.min(totalSlides-1,s.slideIndex+1)})) };
+      }
+    }
+
+    // quiz
+    if(screen==='quiz' && st.quiz){
+      const qz=st.quiz; const q=qz.questions[qz.qIndex]; const ans=qz.answers[q.id];
+      const isLast=qz.qIndex===qz.questions.length-1;
+      const typeLabel={MULTIPLE_CHOICE:'Multiple choice',FILL_BLANK:'Fill in the blank',DRAG_AND_DROP:'Match'}[q.type];
+      const qv={ typeLabel, prompt:q.prompt, points:q.points, isMC:q.type==='MULTIPLE_CHOICE', isFill:q.type==='FILL_BLANK', isDnd:q.type==='DRAG_AND_DROP' };
+      let answered=false;
+      if(q.type==='MULTIPLE_CHOICE'){
+        answered=!!(ans&&ans.length);
+        qv.options=q.options.map((o,i)=>{ const sel=ans&&ans.includes(o.id);
+          return { text:o.text, letter:String.fromCharCode(65+i), dot:sel?'#1d4e89':'#9aa6b8',
+            cls:'btn text-start d-flex align-items-center '+(sel?'border-primary':'border'), 
+            onPick:()=>this.pickMC(q.id,o.id) }; });
+        // styling fix: ensure consistent look
+        qv.options=qv.options.map(o=>({...o, cls:o.cls+' p-3 rounded'}));
+      } else if(q.type==='FILL_BLANK'){
+        answered=!!(ans&&String(ans).trim()); qv.fill=true;
+      } else {
+        const placed=ans?Object.keys(ans).length:0; answered=placed===q.zones.length;
+        qv.draggables=q.draggables.map(d=>({ text:d.text, cls:'btn btn-sm '+(qz.dndPick===d.id?'btn-primary':'btn-outline-primary'), onPick:()=>this.pickDnd(d.id) }));
+        qv.zones=q.zones.map(z=>{ const did=ans&&ans[z.id]; const dd=did&&q.draggables.find(x=>x.id===did);
+          return { label:z.label, text:dd?dd.text:'Drop here', cls:'btn btn-sm '+(dd?'btn-secondary':'btn-outline-secondary'), onDrop:()=>this.dropDnd(q.id,z.id) }; });
+      }
+      vals.quiz={ active:!qz.done, done:qz.done, title:qz.title, passingScore:qz.passingScore,
+        progressPct:Math.round((qz.qIndex)/qz.questions.length*100), qNum:qz.qIndex+1, qTotal:qz.questions.length,
+        q:qv, fillValue:q.type==='FILL_BLANK'?(ans||''):'', onFill:(e)=>this.setFill(q.id,e.target.value),
+        nextLabel:isLast?'Submit quiz':'Next question', nextCls:'btn btn-primary'+(answered?'':' disabled'),
+        onNext:()=> answered? this.nextQuestion():null, onExit:()=>this.openCourse(st.curCourse), onRetry:()=>this.retryQuiz(),
+        scorePct:qz.score, xpEarned:qz.xpEarned, passed:qz.passed,
+        resultTitle:qz.passed?'Quiz passed!':'Keep practising',
+        resultIcon:qz.passed?'bi bi-patch-check-fill':'bi bi-arrow-repeat',
+        resultBg:qz.passed?'#e7f5ee':'#fdecec', resultColor:qz.passed?'#1d8a5b':'#c0392b' };
+    }
+
+    // achievements
+    const achDefs=[
+      {title:'First Steps',req:'Complete your first lesson',icon:'bi bi-flag-fill',unlocked:true},
+      {title:'Quiz Whiz',req:'Pass 5 quizzes',icon:'bi bi-patch-check-fill',unlocked:true},
+      {title:'On Fire',req:'Reach a 7-day streak',icon:'bi bi-fire',unlocked:true},
+      {title:'Scholar',req:'Earn 1,000 XP',icon:'bi bi-mortarboard-fill',unlocked:true},
+      {title:'Course Champion',req:'Finish a full course',icon:'bi bi-trophy-fill',unlocked:false},
+      {title:'Perfectionist',req:'Score 100% on a quiz',icon:'bi bi-star-fill',unlocked:false},
+      {title:'Marathoner',req:'Reach a 30-day streak',icon:'bi bi-calendar-check-fill',unlocked:false},
+      {title:'Polymath',req:'Enroll in 3 categories',icon:'bi bi-stars',unlocked:false}
+    ];
+    vals.achievements=achDefs.map(a=>({ title:a.title, requirement:a.req, icon:a.icon,
+      opacity:a.unlocked?1:0.5, bg:a.unlocked?'#eef3fa':'#eef1f6', color:a.unlocked?'#1d4e89':'#9aa6b8' }));
+    vals.achUnlockedCount=achDefs.filter(a=>a.unlocked).length; vals.achTotal=achDefs.length;
+
+    // admin dashboard
+    vals.kpis=[
+      {label:'Daily Active',icon:'bi bi-person-check',value:'8,420',delta:'\u2191 6.2% vs last week',deltaColor:'#1d8a5b'},
+      {label:'Weekly Active',icon:'bi bi-calendar-week',value:'31,900',delta:'\u2191 3.1%',deltaColor:'#1d8a5b'},
+      {label:'DAU / MAU',icon:'bi bi-activity',value:'46%',delta:'Stickiness',deltaColor:'#6b7686'},
+      {label:'Retention',icon:'bi bi-arrow-repeat',value:'72%',delta:'\u2193 1.4%',deltaColor:'#c0392b'}
+    ];
+    const popRaw=st.courses.map(c=>({title:c.title,count:st.enrolledCounts[c.id]||0}));
+    const popMax=Math.max(1,...popRaw.map(p=>p.count));
+    vals.popularity=popRaw.map(p=>({title:p.title,count:p.count,pct:Math.round(p.count/popMax*100)}));
+    vals.completion=st.courses.map((c,i)=>({title:c.title,pct:[78,64,52][i]||60}));
+
+    // admin courses table
+    vals.onNewCourse=()=>this.openModal({kind:'course',mode:'create',title:'New course',saveLabel:'Create course',form:{title:'',category:'',description:''}});
+    vals.adminCourses=st.courses.map(c=>({ title:c.title, description:c.description, category:c.category,
+      chapterCount:c.chapters.length, enrolledCount:st.enrolledCounts[c.id]||0,
+      onEditContent:()=>this.openEditor(c.id),
+      onEdit:()=>this.openModal({kind:'course',mode:'edit',courseId:c.id,title:'Edit course',saveLabel:'Save changes',form:{title:c.title,category:c.category,description:c.description}}),
+      onDelete:()=>this.deleteCourse(c.id) }));
+
+    // admin editor
+    if(screen==='a_editor'){
+      const c=this.course(st.curCourse);
+      if(c){ vals.ed={ category:c.category, title:c.title, description:c.description,
+        onEditDetails:()=>this.openModal({kind:'course',mode:'edit',courseId:c.id,title:'Edit course',saveLabel:'Save changes',form:{title:c.title,category:c.category,description:c.description}}),
+        onAddChapter:()=>this.openModal({kind:'chapter',mode:'create',courseId:c.id,title:'Add chapter',saveLabel:'Add chapter',form:{title:'',description:'',xpReward:50}}),
+        chapters:c.chapters.map((ch,i)=>({ num:i+1, title:ch.title, xpReward:ch.xpReward,
+          onEdit:()=>this.openModal({kind:'chapter',mode:'edit',courseId:c.id,chapterId:ch.id,title:'Edit chapter',saveLabel:'Save changes',form:{title:ch.title,description:ch.description,xpReward:ch.xpReward}}),
+          onDelete:()=>this.deleteChapter(c.id,ch.id),
+          onAddModule:()=>this.openModal({kind:'module',mode:'create',courseId:c.id,chapterId:ch.id,title:'Add module',saveLabel:'Add module',form:{title:'',type:'VIDEO',meta:'',url:''}}),
+          onAddQuiz:()=>this.openModal({kind:'quiz',mode:'create',courseId:c.id,chapterId:ch.id,title:'Add quiz',saveLabel:'Add quiz',form:{title:'',passingScore:70}}),
+          modules:ch.modules.map(m=>({ title:m.title, icon:m.type==='VIDEO'?'bi bi-play-circle-fill':'bi bi-easel-fill',
+            meta:m.type==='VIDEO'?('Video \u00B7 '+m.duration):('Slides \u00B7 '+m.slides+' slides'),
+            onEdit:()=>this.openModal({kind:'module',mode:'edit',courseId:c.id,chapterId:ch.id,moduleId:m.id,title:'Edit module',saveLabel:'Save changes',form:{title:m.title,type:m.type,meta:m.type==='VIDEO'?m.duration:String(m.slides),url:m.url||''}}),
+            onDelete:()=>this.deleteModule(c.id,ch.id,m.id) })),
+          quizzes:ch.quizzes.map(q=>({ title:q.title, passingScore:q.passingScore, count:q.questions.length,
+            onQuestions:()=>this.openQuizEditor(c.id,ch.id,q.id),
+            onEdit:()=>this.openModal({kind:'quiz',mode:'edit',courseId:c.id,chapterId:ch.id,quizId:q.id,title:'Edit quiz',saveLabel:'Save changes',form:{title:q.title,passingScore:q.passingScore}}),
+            onDelete:()=>this.deleteQuiz(c.id,ch.id,q.id) })) })) };
+      }
+    }
+    vals.onBackToCourses=()=>this.go('a_courses');
+
+    // admin quiz editor (questions CRUD)
+    if(screen==='a_quizedit'){
+      const c=this.course(st.curCourse); const ch=c&&c.chapters.find(x=>x.id===st.curChapter); const qz=ch&&ch.quizzes.find(x=>x.id===st.curQuiz);
+      if(qz){
+        const tinfo={MULTIPLE_CHOICE:{l:'Multiple choice',bg:'#eef3fa',color:'#1d4e89'},FILL_BLANK:{l:'Fill in the blank',bg:'#fdf3e3',color:'#b9761b'},DRAG_AND_DROP:{l:'Match pairs',bg:'#e7f5ee',color:'#1d8a5b'}};
+        vals.qe={ title:qz.title, passingScore:qz.passingScore, chapterTitle:ch.title,
+          hasQuestions:qz.questions.length>0, noQuestions:qz.questions.length===0,
+          onBack:()=>this.openEditor(c.id),
+          onEditShell:()=>this.openModal({kind:'quiz',mode:'edit',courseId:c.id,chapterId:ch.id,quizId:qz.id,title:'Edit quiz',saveLabel:'Save changes',form:{title:qz.title,passingScore:qz.passingScore}}),
+          onAddQuestion:()=>this.openModal({kind:'question',mode:'create',courseId:c.id,chapterId:ch.id,quizId:qz.id,title:'Add question',saveLabel:'Add question',form:this.newQuestionForm()}),
+          questions:qz.questions.map((q,i)=>{ const ti=tinfo[q.type]||tinfo.MULTIPLE_CHOICE; let meta='';
+            if(q.type==='MULTIPLE_CHOICE') meta=q.options.length+' options'; else if(q.type==='FILL_BLANK') meta=q.answers.length+' accepted'; else meta=q.zones.length+' pairs';
+            return { num:i+1, prompt:q.prompt, points:q.points, meta, typeLabel:ti.l, bg:ti.bg, color:ti.color,
+              onEdit:()=>this.openModal({kind:'question',mode:'edit',courseId:c.id,chapterId:ch.id,quizId:qz.id,questionId:q.id,title:'Edit question',saveLabel:'Save changes',form:this.questionToForm(q)}),
+              onDelete:()=>this.deleteQuestion(c.id,ch.id,qz.id,q.id) }; }) };
+      }
+    }
+
+    // students
+    vals.students=st.students.map(s=>({ name:s.name, email:s.email, plan:s.plan, xp:s.xp.toLocaleString(), status:s.status,
+      planCls:'badge rounded-pill '+(s.plan==='Premium'?'':''),
+      statusCls:'badge rounded-pill', 
+      toggleLabel:s.status==='Active'?'Disable':'Enable',
+      onToggle:()=>this.toggleStudent(s.id), onDelete:()=>this.deleteStudent(s.id) }));
+    // refine badges via inline style strings not available; use classes
+    vals.students=st.students.map(s=>({ name:s.name, email:s.email, plan:s.plan, xp:s.xp.toLocaleString(), status:s.status,
+      planCls: s.plan==='Premium'?'badge rounded-pill text-bg-primary':'badge rounded-pill text-bg-light',
+      statusCls: s.status==='Active'?'badge rounded-pill text-bg-success':'badge rounded-pill text-bg-secondary',
+      toggleLabel:s.status==='Active'?'Disable':'Enable',
+      onToggle:()=>this.toggleStudent(s.id), onDelete:()=>this.deleteStudent(s.id) }));
+
+    // modal
+    const m=st.modal;
+    vals.hasModal=!!m;
+    if(m){ const isMod=m.kind==='module'; const isQ=m.kind==='question'; const f=m.form;
+      vals.modal={ title:m.title, saveLabel:m.saveLabel, form:m.form,
+        maxw: isQ?'600px':'480px',
+        isCourse:m.kind==='course', isChapter:m.kind==='chapter', isModule:isMod, isQuiz:m.kind==='quiz', isQuestion:isQ,
+        metaLabel: isMod ? (f.type==='VIDEO'?'Duration (m:ss)':'Number of slides') : '',
+        urlLabel: isMod ? (f.type==='VIDEO'?'Video URL':'Slides URL') : '',
+        q_isMC:isQ&&f.type==='MULTIPLE_CHOICE', q_isFill:isQ&&f.type==='FILL_BLANK', q_isDnd:isQ&&f.type==='DRAG_AND_DROP',
+        optionRows: (isQ&&f.options)? f.options.map((o,i)=>({ text:o.text, correct:o.correct, onText:(e)=>this.updForm(ff=>{ff.options[i].text=e.target.value;}), onToggle:()=>this.updForm(ff=>{ff.options[i].correct=!ff.options[i].correct;}), onRemove:()=>this.updForm(ff=>{ff.options.splice(i,1);}) })):[],
+        answerRows: (isQ&&f.answers)? f.answers.map((a,i)=>({ text:a, onText:(e)=>this.updForm(ff=>{ff.answers[i]=e.target.value;}), onRemove:()=>this.updForm(ff=>{ff.answers.splice(i,1);}) })):[],
+        pairRows: (isQ&&f.pairs)? f.pairs.map((p,i)=>({ term:p.term, match:p.match, onTerm:(e)=>this.updForm(ff=>{ff.pairs[i].term=e.target.value;}), onMatch:(e)=>this.updForm(ff=>{ff.pairs[i].match=e.target.value;}), onRemove:()=>this.updForm(ff=>{ff.pairs.splice(i,1);}) })):[],
+        q_addOption:()=>this.updForm(ff=>{(ff.options=ff.options||[]).push({text:'',correct:false});}),
+        q_addAnswer:()=>this.updForm(ff=>{(ff.answers=ff.answers||[]).push('');}),
+        q_addPair:()=>this.updForm(ff=>{(ff.pairs=ff.pairs||[]).push({term:'',match:''});}),
+        set_qtype:(e)=>this.setQType(e.target.value),
+        set_prompt:(e)=>this.setForm('prompt',e.target.value),
+        set_points:(e)=>this.setForm('points',e.target.value),
+        set_caseSensitive:()=>this.updForm(ff=>{ff.caseSensitive=!ff.caseSensitive;}),
+        onClose:()=>this.closeModal(), onSave:()=>this.saveModal(), onBackdrop:()=>this.closeModal(),
+        stop:(e)=>e.stopPropagation(),
+        set_title:(e)=>this.setForm('title',e.target.value),
+        set_category:(e)=>this.setForm('category',e.target.value),
+        set_description:(e)=>this.setForm('description',e.target.value),
+        set_xpReward:(e)=>this.setForm('xpReward',e.target.value),
+        set_type:(e)=>this.setForm('type',e.target.value),
+        set_meta:(e)=>this.setForm('meta',e.target.value),
+        set_url:(e)=>this.setForm('url',e.target.value),
+        set_passingScore:(e)=>this.setForm('passingScore',e.target.value) };
+    }
+
+    return vals;
+  }
+}
+</script>
+</body>
+</html>
