@@ -42,7 +42,7 @@ public class RegisterServlet extends HttpServlet {
                 return;
             }
             userDAO.createStudent(name, email, User.hash(password));
-            resp.sendRedirect(req.getContextPath() + "/login.jsp?registered=true");
+            com.mathify.util.NavigationUtil.redirectWithLoading(req, resp, req.getContextPath() + "/login.jsp?registered=true", "Creating your account...");
         } catch (SQLException e) {
             getServletContext().log("Register DB error", e);
             resp.sendRedirect(req.getContextPath() + "/register.jsp?error=server_error");

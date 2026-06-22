@@ -1,6 +1,7 @@
 package com.mathify.servlet;
 
 import com.mathify.dao.UserDAO;
+import com.mathify.model.Admin;
 import com.mathify.model.Student;
 
 import jakarta.servlet.ServletException;
@@ -27,6 +28,20 @@ public class LoginServlet extends HttpServlet {
         }
 
         try {
+            Admin admin = userDAO.findAdminByEmail(email);
+            if (admin != null && admin.login(email, password)) {
+                HttpSession session = req.getSession(true);
+                session.setAttribute("userId",   admin.getUserId());
+                session.setAttribute("userName", admin.getName());
+                session.setAttribute("userRole", "ADMIN");
+                
+                // Set persistent auth cookie
+                com.mathify.util.AuthUtil.addAuthCookie(resp, admin.getUserId());
+                
+                com.mathify.util.NavigationUtil.redirectWithLoading(req, resp, req.getContextPath() + "/admin/dashboard.jsp", "Preparing admin dashboard...");
+                return;
+            }
+
             Student student = userDAO.findStudentByEmail(email);
             if (student != null && student.login(email, password)) {
                 HttpSession session = req.getSession(true);
@@ -37,7 +52,7 @@ public class LoginServlet extends HttpServlet {
                 // Set persistent auth cookie
                 com.mathify.util.AuthUtil.addAuthCookie(resp, student.getUserId());
                 
-                resp.sendRedirect(req.getContextPath() + "/student/dashboard.do");
+                com.mathify.util.NavigationUtil.redirectWithLoading(req, resp, req.getContextPath() + "/student/dashboard.do", "Loading your dashboard...");
             } else {
                 resp.sendRedirect(req.getContextPath() + "/login.jsp?error=invalid_credentials");
             }

@@ -1,4 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<c:if test="${empty requestScope.studentsLoaded}">
+    <jsp:forward page="/admin/students.do" />
+</c:if>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,56 +27,53 @@
       <th class="ps-4">Name</th><th>Email</th><th>Plan</th><th class="text-center">XP</th><th>Status</th><th class="text-end pe-4">Actions</th>
     </tr></thead>
     <tbody>
+      <c:forEach var="student" items="${students}">
       <tr>
-        <td class="ps-4 fw-semibold">Maya Chen</td>
-        <td class="text-secondary">maya@school.edu</td>
-        <td><span class="badge rounded-pill text-bg-primary">Premium</span></td>
-        <td class="text-center">2,480</td>
-        <td><span class="badge rounded-pill text-bg-success">Active</span></td>
-        <td class="text-end pe-4"><div class="d-inline-flex gap-1">
-          <button class="btn btn-sm btn-outline-secondary">Disable</button>
-          <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-        </div></td>
+        <td class="ps-4 fw-semibold"><c:out value="${student.name}"/></td>
+        <td class="text-secondary"><c:out value="${student.email}"/></td>
+        <td>
+          <c:choose>
+            <c:when test="${student.plan == 'Premium'}">
+              <span class="badge rounded-pill text-bg-primary">Premium</span>
+            </c:when>
+            <c:otherwise>
+              <span class="badge rounded-pill text-bg-light border">Free</span>
+            </c:otherwise>
+          </c:choose>
+        </td>
+        <td class="text-center"><fmt:formatNumber value="${student.totalXp}" type="number"/></td>
+        <td>
+          <c:choose>
+            <c:when test="${student.status == 'Active'}">
+              <span class="badge rounded-pill text-bg-success">Active</span>
+            </c:when>
+            <c:otherwise>
+              <span class="badge rounded-pill text-bg-secondary">Disabled</span>
+            </c:otherwise>
+          </c:choose>
+        </td>
+        <td class="text-end pe-4">
+          <form action="${pageContext.request.contextPath}/admin/student-action.do" method="post" class="d-inline-flex gap-1 mb-0">
+            <input type="hidden" name="studentId" value="${student.studentId}"/>
+            <c:choose>
+              <c:when test="${student.status == 'Active'}">
+                <button type="submit" name="action" value="disable" class="btn btn-sm btn-outline-secondary">Disable</button>
+              </c:when>
+              <c:otherwise>
+                <button type="submit" name="action" value="enable" class="btn btn-sm btn-outline-secondary">Enable</button>
+              </c:otherwise>
+            </c:choose>
+            <button type="submit" name="action" value="delete" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this student?');"><i class="bi bi-trash"></i></button>
+          </form>
+        </td>
       </tr>
-      <tr>
-        <td class="ps-4 fw-semibold">Liam Patel</td>
-        <td class="text-secondary">liam@school.edu</td>
-        <td><span class="badge rounded-pill text-bg-light">Free</span></td>
-        <td class="text-center">640</td>
-        <td><span class="badge rounded-pill text-bg-success">Active</span></td>
-        <td class="text-end pe-4"><div class="d-inline-flex gap-1">
-          <button class="btn btn-sm btn-outline-secondary">Disable</button>
-          <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-        </div></td>
-      </tr>
-      <tr>
-        <td class="ps-4 fw-semibold">Sofia Rossi</td>
-        <td class="text-secondary">sofia@school.edu</td>
-        <td><span class="badge rounded-pill text-bg-light">Free</span></td>
-        <td class="text-center">1,120</td>
-        <td><span class="badge rounded-pill text-bg-success">Active</span></td>
-        <td class="text-end pe-4"><div class="d-inline-flex gap-1">
-          <button class="btn btn-sm btn-outline-secondary">Disable</button>
-          <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-        </div></td>
-      </tr>
-      <tr>
-        <td class="ps-4 fw-semibold">Noah Kim</td>
-        <td class="text-secondary">noah@school.edu</td>
-        <td><span class="badge rounded-pill text-bg-primary">Premium</span></td>
-        <td class="text-center">3,050</td>
-        <td><span class="badge rounded-pill text-bg-secondary">Disabled</span></td>
-        <td class="text-end pe-4"><div class="d-inline-flex gap-1">
-          <button class="btn btn-sm btn-outline-secondary">Enable</button>
-          <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-        </div></td>
-      </tr>
+      </c:forEach>
     </tbody>
   </table></div></div>
 
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="../assets/js/app.js"></script>
+<script src="../assets/js/app.js?v=3" data-username="${sessionScope.userName}"></script>
 </body>
 </html>
