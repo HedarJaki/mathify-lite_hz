@@ -83,7 +83,7 @@ built from.
 subtype), plus progress/reporting types (`UserProgress`,
 `ChapterProgress`, `QuizAttempt`, `Achievement`, `ReportMetric`,
 `Notification`). The original UML class diagram this was modeled from is
-indexed in [DESIGN.md](DESIGN.md).
+[`CLASS_DIAGRAM.json`](CLASS_DIAGRAM.json) (see [DESIGN.md](DESIGN.md)).
 
 ## Build & deploy
 

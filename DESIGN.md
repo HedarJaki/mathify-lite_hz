@@ -26,8 +26,9 @@ JSPs/servlets. Open any of them directly in a browser.
 
 ## UML class diagram
 
-- **`uploads/Mathify.json`** — Lucidchart export of the domain model class
-  diagram (`User`/`Student`/`Admin`, `Course`/`Chapter`/`Topic`, quiz and
-  question hierarchy, `Achievement`, etc.). This is the diagram the
-  `src/main/java/com/mathify/model/` classes were derived from; open it at
-  lucid.app (Import) to view/edit it visually.
+The Lucidchart export of the domain model class diagram
+(`User`/`Student`/`Admin`, `Course`/`Chapter`/`Topic`, quiz and question
+hierarchy, `Achievement`, etc.) lives at [`CLASS_DIAGRAM.json`](CLASS_DIAGRAM.json)
+in the repo root, not under `design/` — it's the diagram the
+`src/main/java/com/mathify/model/` classes were derived from. Open it at
+lucid.app (Import) to view/edit it visually.
