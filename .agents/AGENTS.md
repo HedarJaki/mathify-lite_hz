@@ -1,5 +1,10 @@
 # Project Rules and Knowledge
 
+See [ARCHITECTURE.md](../ARCHITECTURE.md) for how the app fits together,
+[README.md](../README.md) for setup, and [CLAUDE.md](../CLAUDE.md) for the
+equivalent rules file used by Claude Code — keep the two in sync when either
+changes.
+
 ## Servlet Mappings and Deployment
 - **Avoid Duplicate Mappings:** Do NOT map a servlet in `web.xml` if it already has a `@WebServlet` annotation. Doing so will cause Tomcat to crash during startup and result in 404s for the entire application.
 - **Context Path:** The `cargo-maven3-plugin` in this project is configured to deploy at the root context (`<context>/</context>`). This means the application is accessible at `http://localhost:8080/`, not `http://localhost:8080/mathify-lite/`. Always account for this when manually pinging URLs or debugging routing.

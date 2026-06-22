@@ -2,6 +2,13 @@
 
 Guidance for Claude Code (and other agents) working in this repository.
 
+## Related docs
+
+- [README.md](README.md) — setup & how to run the project
+- [ARCHITECTURE.md](ARCHITECTURE.md) — request flow, auth, data layer, build/deploy
+- [DESIGN.md](DESIGN.md) — index of the visual mockups and UML diagram in `design/`
+- [AGENTS.md](.agents/AGENTS.md) — the equivalent rules file for non-Claude agents (Codex, etc.); keep in sync with this file when either changes
+
 ## Project
 
 **Mathify Lite** — a Java servlet web application for a gamified math learning

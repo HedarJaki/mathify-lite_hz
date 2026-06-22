@@ -1,13 +1,26 @@
 # Maven build output
 target/
+*.war
+*.class
+
+# Logs / crash dumps
+*.log
+hs_err_pid*.log
+
+# Env / local overrides
+.env
+.env.*
+*.local
 
 # IDEs
 .idea/
+out/
 *.iml
 .vscode/
 .settings/
 .classpath
 .project
+.factorypath
 
 # OS
 .DS_Store
