@@ -10,9 +10,16 @@
 (function () {
   "use strict";
 
+  // Read dynamic user info injected into the script tag
+  var currentScript = document.querySelector('script[src*="app.js"]');
+  var dynamicUserName = currentScript ? currentScript.getAttribute("data-username") : null;
+  if (!dynamicUserName || dynamicUserName.trim() === "") {
+      dynamicUserName = "User";
+  }
+
   // Sample profile — mirrors the prototype's initial state.
   var profile = {
-    name: "Alex Rivera",
+    name: dynamicUserName,
     level: 4,
     totalXP: 1240,
     streak: 12,
@@ -75,12 +82,7 @@
         "</div>";
     }
 
-    var avatarText = isStudent ? initials(profile.name) : "AD";
-
-    // role switch (handy for navigating the static demo)
-    var switchTo = isStudent
-      ? '<a class="dropdown-item" href="' + base + 'admin/dashboard.jsp"><i class="bi bi-shield-lock me-2"></i>Admin area</a>'
-      : '<a class="dropdown-item" href="' + base + 'student/dashboard.do"><i class="bi bi-mortarboard me-2"></i>Student area</a>';
+    var avatarHtml = '<i class="bi bi-person-fill" style="font-size:1.2rem;"></i>';
 
     var nav = el(
       '<nav class="navbar navbar-expand-md sticky-top px-3" style="background:#fff;border-bottom:1px solid #e2e7ef;z-index:1030;">' +
@@ -94,10 +96,11 @@
             '<div class="d-flex align-items-center gap-3 ms-auto">' +
               cluster +
               '<div class="dropdown">' +
-                '<div class="rounded-circle d-flex align-items-center justify-content-center fw-semibold avatar" role="button" data-bs-toggle="dropdown">' + avatarText + "</div>" +
+                '<div class="rounded-circle d-flex align-items-center justify-content-center fw-semibold avatar" role="button" data-bs-toggle="dropdown">' + avatarHtml + "</div>" +
                 '<ul class="dropdown-menu dropdown-menu-end">' +
                   '<li><h6 class="dropdown-header">' + (isStudent ? profile.name : "Administrator") + "</h6></li>" +
-                  "<li>" + switchTo + "</li>" +
+                  '<li><hr class="dropdown-divider"></li>' +
+                  '<li><a class="dropdown-item text-danger" href="' + base + 'logout.do"><i class="bi bi-box-arrow-right me-2"></i>Log out</a></li>' +
                 "</ul>" +
               "</div>" +
             "</div>" +

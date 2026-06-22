@@ -21,7 +21,7 @@ public class CourseDetailServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String courseId = req.getParameter("id");
         if (courseId == null || courseId.isEmpty()) {
-            resp.sendRedirect("catalog.do");
+            com.mathify.util.NavigationUtil.redirectWithLoading(req, resp, req.getContextPath() + "/student/catalog.do", "Returning to catalog...");
             return;
         }
 
