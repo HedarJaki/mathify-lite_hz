@@ -40,12 +40,54 @@ mvn package               # build target/mathify-lite.war
 
 ## Database
 
-- Schema lives in **`mathify_schema.sql`** (repo root); database name `mathify_db`.
+- Schema lives in **`database/mathify_schema.sql`**; database name `mathify_db`.
+  Seed scripts (`database/insert_admin.sql`, `database/insert_course_1.sql`) and
+  migrations also live under `database/`.
 - Connection settings are in **`src/main/resources/db.properties`**
   (`db.url`, `db.user`, `db.password`), read once by
   `com.mathify.db.DBUtil` which exposes `DBUtil.getConnection()`.
-- Default config expects a local MySQL at `localhost:3306`, user `root`, empty
-  password. Do **not** commit real credentials.
+- Default config expects a local MySQL/MariaDB at `localhost:3306`, user `root`,
+  empty password (matches a default XAMPP install). Do **not** commit real
+  credentials.
+- **Keep the schema in sync with the DAOs.** The code expects columns that were
+  not always reflected in `mathify_schema.sql` — e.g. `users.is_disabled`
+  (`BOOLEAN NOT NULL DEFAULT FALSE`, used by the admin "disable student"
+  feature). A missing column surfaces as a `?error=server_error` redirect on
+  login/register. If you add a column in a DAO, also add it to the schema file
+  and a `database/migration_*.sql`.
+
+## Payments (Midtrans)
+
+The **Go Premium** upgrade uses the **Midtrans Snap** flow (sandbox by default).
+
+- **Credentials** are read from a gitignored **`.env`** at the project root by
+  `com.mathify.util.MidtransConfig` (keys: `MIDTRANS_SERVER_KEY`,
+  `MIDTRANS_CLIENT_KEY`, `MIDTRANS_MERCHANT_ID`, `MIDTRANS_IS_PRODUCTION`,
+  `MIDTRANS_PREMIUM_PRICE`). OS env vars override `.env`. See `.env.example`.
+  `MidtransConfig` finds `.env` by walking up from the working directory, which
+  works under `mvn cargo:run` (cwd = project root). Sandbox keys may or may not
+  carry an `SB-` prefix; verify against the **sandbox** dashboard, not production.
+- **Flow:** `assets/js/app.js`-independent inline script on `student/premium.jsp`
+  → `POST /student/premium/checkout.do` (`PremiumCheckoutServlet`) creates a Snap
+  token server-side via `com.mathify.service.MidtransService` (Basic auth =
+  `Base64(serverKey + ":")`). The browser opens Snap with that token; on
+  success/pending it calls `POST /student/premium/confirm.do`
+  (`PremiumConfirmServlet`), which **re-checks the status server-to-server**
+  before granting premium. The client's own success callback is never trusted.
+- **The amount is fixed server-side** (`MidtransConfig.getPremiumPriceIdr`, IDR);
+  never take the charge amount from the client.
+- **Persistence:** `com.mathify.dao.SubscriptionDAO` upserts the `subscriptions`
+  row. Two columns were added for tracking: `midtrans_order_id VARCHAR(100)` and
+  `payment_status VARCHAR(30)` (migration: `database/migration_add_payment_tracking.sql`).
+- **No webhook on localhost:** premium is activated during `confirm.do` via a
+  status check, so the integration works without a public notification URL. For
+  production, also configure a Midtrans notification/webhook endpoint.
+- **Testing:** sandbox card `4811 1111 1111 1114`, CVV `123`, OTP `112233` is the
+  quickest path. Sandbox QRIS QR codes cannot be scanned by real apps — use the
+  Midtrans simulator (`https://simulator.sandbox.midtrans.com/`).
+- The navbar premium badge / energy / XP are filled from `GET /student/profile.do`
+  (`StudentProfileServlet`), fetched by `app.js`; it falls back to sample values
+  on error. `org.json` (in `pom.xml`) is used for all JSON build/parse.
 
 ## Layout
 
@@ -82,7 +124,12 @@ mathify_schema.sql            — MySQL schema
   navbar at runtime from `data-role` / `data-page` / `data-base` attributes on
   `<body>`. Update `app.js` when adding nav destinations, not each page.
 - Use the **Jakarta** namespace (`jakarta.servlet.*`). Never `javax.servlet.*`.
-- Servlets are registered in `web.xml` (no annotations). Add new servlets there.
+- **Two servlet registration styles coexist.** The original auth servlets
+  (`LoginServlet`, `RegisterServlet`) are mapped in `web.xml`. Newer servlets in
+  `servlet/student/` and `servlet/admin/` use `@WebServlet` annotations (e.g.
+  `@WebServlet("/student/dashboard.do")`) and are component-scanned — follow the
+  annotation style for new servlets in those packages. `StudentAuthFilter`
+  (`@WebFilter("/student/*")`) and `AdminAuthFilter` guard those routes.
 - DAO methods throw `SQLException`; servlets catch it, log via
   `getServletContext().log(...)`, and redirect with an `?error=...` query param
   that the target JSP reads client-side to show an alert banner.

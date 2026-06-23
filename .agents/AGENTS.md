@@ -13,3 +13,16 @@ changes.
 ## Navigation and Loading Screens
 - **Use Loading Screens:** For forward-moving screen transitions (e.g., successful login, moving to the dashboard, loading catalog items, etc.), do NOT use standard `response.sendRedirect()`. Instead, use `com.mathify.util.NavigationUtil.redirectWithLoading(req, resp, url, message)`.
 - **Fast Redirects for Errors:** Standard `response.sendRedirect()` should ONLY be used for validation errors (e.g., missing fields, wrong password) where the user expects an instant flash back to the form they just submitted.
+
+## Database and Schema
+- **Keep the schema in sync with the DAOs.** DAO queries assume columns that were not always present in `database/mathify_schema.sql`. A missing column shows up as a `?error=server_error` redirect on login/register (the DAO throws `SQLSyntaxErrorException`, the servlet catches it). Known case: `users.is_disabled BOOLEAN NOT NULL DEFAULT FALSE` (admin "disable student" feature). When you add a column in a DAO, add it to the schema file AND a `database/migration_*.sql`.
+- **Schema location:** `database/mathify_schema.sql` (not the repo root). Seeds and migrations live under `database/` too.
+- **Local DB:** defaults target `localhost:3306`, user `root`, empty password — matches a stock XAMPP MySQL/MariaDB. XAMPP also ships its own Tomcat on **port 8080**; if `cargo:run` reports "Port 8080 in use", stop XAMPP's Tomcat (only MySQL is needed).
+
+## Payments (Midtrans)
+- **Snap flow, sandbox by default.** Credentials come from a gitignored `.env` at the project root, read by `com.mathify.util.MidtransConfig` (`MIDTRANS_SERVER_KEY`, `MIDTRANS_CLIENT_KEY`, `MIDTRANS_MERCHANT_ID`, `MIDTRANS_IS_PRODUCTION`, `MIDTRANS_PREMIUM_PRICE`); OS env vars override the file. Never hard-code keys; see `.env.example`.
+- **Server is the source of truth.** `PremiumCheckoutServlet` (`/student/premium/checkout.do`) creates the Snap token with a server-side fixed amount; `PremiumConfirmServlet` (`/student/premium/confirm.do`) re-verifies the transaction status with Midtrans before granting premium. NEVER trust the browser's success callback or a client-supplied amount. HTTP calls live in `com.mathify.service.MidtransService` (Basic auth = `Base64(serverKey + ":")`).
+- **No webhook needed on localhost** — activation happens in `confirm.do` via a status check. For production, also configure a Midtrans notification URL.
+- **Schema:** premium is persisted by `com.mathify.dao.SubscriptionDAO` into the existing `subscriptions` table; tracking columns `midtrans_order_id` + `payment_status` were added (`database/migration_add_payment_tracking.sql`).
+- **Testing:** card `4811 1111 1111 1114`, CVV `123`, OTP `112233`. Sandbox QRIS QR codes are NOT scannable by real apps — use `https://simulator.sandbox.midtrans.com/`.
+- **Navbar data:** the premium badge / energy / XP come from `GET /student/profile.do` (`StudentProfileServlet`), fetched by `app.js`. JSON is built/parsed with `org.json` (in `pom.xml`).
