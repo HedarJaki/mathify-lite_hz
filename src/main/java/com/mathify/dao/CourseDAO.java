@@ -111,11 +111,12 @@ public class CourseDAO {
                         modules.add(new VideoModule(info, url, Duration.ofSeconds(durationSecs), null));
                     } else if ("SLIDE".equals(typeStr)) {
                         int slideCount = rs.getInt("slide_count");
+                        String url = rs.getString("content_url");
                         List<Slide> slides = new ArrayList<>();
                         for (int i = 0; i < slideCount; i++) {
                             slides.add(new Slide(i, "", "")); // mock slide
                         }
-                        modules.add(new SlideModule(info, slides, 30));
+                        modules.add(new SlideModule(info, url, slides, 30));
                     }
                 }
             }
@@ -299,11 +300,12 @@ public class CourseDAO {
                         return new VideoModule(info, url, Duration.ofSeconds(durationSecs), null);
                     } else if ("SLIDE".equals(typeStr)) {
                         int slideCount = rs.getInt("slide_count");
+                        String url = rs.getString("content_url");
                         List<Slide> slides = new ArrayList<>();
                         for (int i = 0; i < slideCount; i++) {
                             slides.add(new Slide(i, "", "")); // mock slide
                         }
-                        return new SlideModule(info, slides, 30);
+                        return new SlideModule(info, url, slides, 30);
                     }
                 }
             }

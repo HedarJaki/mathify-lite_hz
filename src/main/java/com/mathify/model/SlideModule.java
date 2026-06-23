@@ -8,13 +8,20 @@ import java.util.List;
 public final class SlideModule implements LearningModule {
 
     private final ModuleInfo info;
+    private final String contentUrl;
     private final List<Slide> slides;
     private final int secondsPerSlide;
 
-    public SlideModule(ModuleInfo info, List<Slide> slides, int secondsPerSlide) {
+    public SlideModule(ModuleInfo info, String contentUrl, List<Slide> slides, int secondsPerSlide) {
         this.info = info;
+        this.contentUrl = contentUrl;
         this.slides = slides;
         this.secondsPerSlide = secondsPerSlide;
+    }
+
+    /** External URL of the slide deck (e.g. a PDF or hosted presentation). */
+    public String getContentUrl() {
+        return contentUrl;
     }
 
     public ModuleInfo getInfo() {

@@ -2,6 +2,7 @@
 <%@ page import="com.mathify.model.LearningModule" %>
 <%@ page import="com.mathify.model.ModuleType" %>
 <%@ page import="com.mathify.model.VideoModule" %>
+<%@ page import="com.mathify.model.SlideModule" %>
 <%@ page import="java.net.URI" %>
 <%@ page import="java.net.URLDecoder" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
@@ -96,6 +97,13 @@
   VideoModule videoModule = isVideo ? (VideoModule) module : null;
   String videoUrl = isVideo ? toEmbeddableVideoUrl(videoModule.getVideoUrl()) : "";
   String safeVideoUrl = escapeHtml(videoUrl);
+
+  SlideModule slideModule = !isVideo ? (SlideModule) module : null;
+  String slideUrl = slideModule != null ? slideModule.getContentUrl() : "";
+  boolean hasSlides = slideUrl != null && !slideUrl.isBlank();
+  String safeSlideUrl = escapeHtml(slideUrl);
+  int slideCount = slideModule != null ? slideModule.getSlides().size() : 0;
+
   String courseId = (String) request.getAttribute("courseId");
 %>
 <!DOCTYPE html>
@@ -121,7 +129,7 @@
   <a class="text-secondary small d-inline-flex align-items-center gap-1 mb-3" href="javascript:history.back()"><i class="bi bi-arrow-left"></i>Back</a>
 
   <div class="card border-0 shadow-sm"><div class="card-body p-4">
-    <div class="text-secondary small fw-semibold mb-1"><%= isVideo ? "VIDEO LESSON" : "LESSON" %></div>
+    <div class="text-secondary small fw-semibold mb-1"><%= isVideo ? "VIDEO LESSON" : "SLIDES" %></div>
     <h3 class="mb-3"><%= module.getTitle() %></h3>
 
     <% if (isVideo) { %>
@@ -133,10 +141,18 @@
         <% } %>
       </div>
       <a class="btn btn-outline-primary btn-sm mb-3" href="<%= safeVideoUrl %>" target="_blank" rel="noopener"><i class="bi bi-box-arrow-up-right me-1"></i>Open video</a>
+    <% } else if (hasSlides) { %>
+      <div class="rounded mb-3 overflow-hidden border" style="height:75vh;min-height:520px;background:#f4f6fa;">
+        <iframe width="100%" height="100%" src="<%= safeSlideUrl %>" title="<%= escapeHtml(module.getTitle()) %>" style="border:0;"></iframe>
+      </div>
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <a class="btn btn-outline-primary btn-sm" href="<%= safeSlideUrl %>" target="_blank" rel="noopener"><i class="bi bi-box-arrow-up-right me-1"></i>Open slides</a>
+        <% if (slideCount > 0) { %><span class="text-secondary small"><i class="bi bi-files me-1"></i><%= slideCount %> slides</span><% } %>
+      </div>
     <% } else { %>
       <div class="ph-stripe rounded d-flex flex-column align-items-center justify-content-center mb-3" style="aspect-ratio:16/9;">
         <span class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" style="width:64px;height:64px;background:#1d4e89;color:#fff;"><i class="bi bi-easel-fill fs-3"></i></span>
-        <code class="text-secondary">slides placeholder</code>
+        <span class="text-secondary">No slides available for this lesson.</span>
       </div>
     <% } %>
 
